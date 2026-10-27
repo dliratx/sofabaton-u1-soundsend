@@ -67,6 +67,18 @@ static void configure(unsigned channel,uint32_t aa,uint32_t crc,unsigned adverti
 unsigned ap_legacy_state(void) {return R8(0x20000270);}
 unsigned ap_configuration_connected(void) {return R8(0x20000163)==0 && ap_legacy_state()==3;}
 unsigned ap_ir_busy(void) {return R8(0x20000134)!=0;}
+void ap_prepare_handoff(void) {
+    /* The native post-poll loop at CFee/D000 restarts the previous HID
+     * advertiser whenever C8 is82 or514. LL disconnect alone cannot release
+     * the radio: the next foreground iteration races that reconnect forever.
+     * End the old HID retry policy before requesting its asynchronous stop.
+     * Keep the mode until disconnect completes, otherwise an existing HID
+     * link would be misclassified as a phone configuration connection. */
+    if(R8(0x20000163)!=0) {
+        R32(0x200000c8)=R8(0x200000ba);R32(0x200000c4)=0;
+        R8(0x200000c1)=0xff;R8(0x200000c2)=0xff;
+    }
+}
 void ap_request_idle(void) {
     if(ap_legacy_state()==1) {
         uint8_t parameters[10];unsigned i,timer;

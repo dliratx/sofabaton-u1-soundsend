@@ -1,7 +1,7 @@
 {
-  "tests_run": 74,
+  "tests_run": 79,
   "passed": true,
-  "module_sha256": "6a22192acad4fb431b6d366188428e69929f8cc87c828649b093dbb80f00c791",
-  "image_sha256": "95079f7b4884a7674f267ec0b4514c6ec3bc39617531f8c4ed22b4809f1f6745",
+  "module_sha256": "94dc7cd509808832e41cbd0326fd17c781e3aeaea3acf115612084123f2ade44",
+  "image_sha256": "66413044e2e4e85505fc06d6307768bb99fcef4281f52e8c21c39af0140cc91f",
   "scope": "Patched ARM hooks + C integration + MMIO port with modeled RF/timer/RSSI and stubbed legacy poll/restore. Not physical RF or OTA recovery validation."
 }

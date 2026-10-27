@@ -13,6 +13,7 @@ extern unsigned u1_original_poll(unsigned a,unsigned b,unsigned c,unsigned d);
 extern void u1_original_screen(void);
 extern uint8_t __ss_ram_start[],__ss_ram_end[];
 enum runtime_phase { RT_IDLE, RT_ACQUIRE, RT_ACTIVE };
+enum link_view { LINK_IDLE, LINK_CONNECTING, LINK_READY, LINK_ERROR };
 struct u1_runtime {
     struct ble_central central;
     struct a8107_port port;
@@ -22,7 +23,7 @@ struct u1_runtime {
     uint8_t phase:2,enabled:1,request:1,probe:2,stop_requested:1,mute_pending:1;
     uint8_t tx_mode,last_volume,last_reason,last_state;
     uint8_t saved_volume,shown_volume,battery;
-    uint8_t muted:1,shown_muted:1,screen_valid:1,repeating:1;
+    uint8_t muted:1,shown_muted:1,screen_valid:1,repeating:1,shown_link:2;
 };
 static struct u1_runtime runtime;
 static const uint8_t own_le[6]={0xab,0x2e,0x00,0x03,0x21,0x20};
@@ -48,23 +49,39 @@ static void draw(unsigned x,unsigned page,const char *s) {
     ((void (*)(unsigned,unsigned,const char *))(uintptr_t)0x11dc9)(x,page,s);
 }
 static unsigned screen_muted(void) {return runtime.muted && runtime.last_volume==0;}
+static unsigned screen_link(void) {
+    if(runtime.phase!=RT_IDLE || runtime.request) {
+        if(runtime.phase==RT_ACTIVE && runtime.central.closing) return LINK_IDLE;
+        if(runtime.phase==RT_ACTIVE && runtime.central.linked && bc_volume(&runtime.central)>=0)
+            return LINK_READY;
+        return LINK_CONNECTING;
+    }
+    return runtime.last_reason ? LINK_ERROR : LINK_IDLE;
+}
+static const char *link_text(unsigned link) {
+    return link==LINK_CONNECTING ? "..." : link==LINK_READY ? " BT" : link==LINK_ERROR ? " ! " : "   ";
+}
 static void show_volume(void) {
-    char line[17]="Volumen: --- %  ",battery[17]="Bat: --- %      ";unsigned v=runtime.last_volume;
+    char title[17]="SoundSend       ",line[17]="Volumen: --- %  ",battery[17]="Bat: --- %      ";
+    unsigned v=runtime.last_volume,link=screen_link(),i;const char *indicator=link_text(link);
     if(runtime.phase!=RT_IDLE || runtime.port.active || !volume_screen_selected()) return;
     if(v<=100) digits(line+9,v);
     if(runtime.battery<=100) digits(battery+5,runtime.battery);
     if(screen_muted()) {battery[12]='M';battery[13]='U';battery[14]='T';battery[15]='E';}
-    draw(0,0,"   SoundSend    ");draw(0,3,line);draw(0,6,battery);
+    for(i=0;i<3;i++) title[13+i]=indicator[i];
+    draw(0,0,title);draw(0,3,line);draw(0,6,battery);
     runtime.shown_volume=(uint8_t)v;runtime.shown_muted=screen_muted();runtime.screen_valid=1;
+    runtime.shown_link=link;
 }
 static void show_confirmed_change(void) {
-    char value[4]="---";unsigned muted=screen_muted();
+    char value[4]="---";unsigned muted=screen_muted(),link=screen_link();
     /* Render at most4 characters per poll between30ms connection events. No ADC,
      * full screen, radio RX/TX or pending launch is allowed on this path.
      * Reserve12ms before the next anchor, including its1ms preparation. */
     if(!runtime.screen_valid || !volume_screen_selected() || bc_status(&runtime.central)!=BC_BETWEEN ||
        runtime.central.action_pending || runtime.port.rx_armed || runtime.port.receive_locked ||
        (int32_t)(runtime.central.next_anchor-ap_now())< (int32_t)US(12000)) return;
+    if(runtime.shown_link!=link) {draw(104,0,link_text(link));runtime.shown_link=link;return;}
     if(runtime.last_volume<=100 && runtime.shown_volume!=runtime.last_volume) {
         digits(value,runtime.last_volume);draw(72,3,value);runtime.shown_volume=runtime.last_volume;return;
     }
@@ -149,7 +166,9 @@ static void apply_mute(void) {
     }
 }
 unsigned u1_key_gateway(unsigned profile,unsigned button) {
-    if(runtime.enabled && !ap_configuration_connected() && soundsend_profile(profile) && (button==4 || button==10 || button==13)) {
+    if(runtime.enabled && !ap_configuration_connected() && R8(0x20000163)!=3 &&
+       R8(0x20000162)!=1 && R8(0x20000162)!=2 &&
+       soundsend_profile(profile) && (button==4 || button==10 || button==13)) {
         /* Stock9c54 calls every loop while held. A physical edge gives one
          * immediate step. Held volume repeats after400ms, then every120ms,
          * only after confirmation. Never queue a catch-up burst while the
@@ -317,8 +336,15 @@ unsigned u1_poll_prepare(void) {
      * original stack. Return0 only while the new central owns this iteration. */
     if(runtime.phase==RT_ACTIVE) {active_poll();return 0;}
     if(!runtime.request) return 1;
-    if(runtime.phase==RT_IDLE) {runtime.phase=RT_ACQUIRE;runtime.attempts=0;runtime.stop_requested=0;}
     if(!runtime.probe && ap_configuration_connected()) {finish(0x92);return 1;}
+    if(runtime.phase==RT_IDLE) {
+        /* Show an attempt before acquisition; a cached percentage is not a
+         * live-link indication. No display/ADC calls run in scanning windows. */
+        if(runtime.screen_valid && volume_screen_selected()) {
+            runtime.shown_link=LINK_CONNECTING;draw(104,0,link_text(LINK_CONNECTING));
+        }
+        ap_prepare_handoff();runtime.phase=RT_ACQUIRE;runtime.attempts=0;runtime.stop_requested=0;
+    }
     /* A stock disconnect completes on a later connection event. Allow a
      * bounded poll budget instead of expiring after64 fast foreground loops. */
     if(++runtime.attempts>4096) {finish(0x93);return 1;}

@@ -39,28 +39,29 @@ Only the **U1 firmware** is modified. SoundSend retains its original firmware. B
   </tr>
 </table>
 
-Click a photo to open the original image. The photographs document the visible interface and hardware; the battery value is the native estimator's reading.
+Click a photo to open the original image. These LAB19 photographs predate the link indicator added in LAB20. The battery value is the native estimator's reading.
 
 ## Current status
 
-**LAB19 / TMRJ is installed; its actual boot was verified on 2026-10-27 at 16:42:40 UTC.** All 7,936 transfer blocks were acknowledged. The installed candidate passed **134 offline tests** and corrects a delayed-response case that reproduced LAB18's failed held-volume test.
+**LAB20 / TMRK is ready for installation after passing 139 offline tests and installer preflight. LAB19 / TMRJ remains installed.** LAB20 addresses a native HID reconnection race when returning from Fire TV to SoundSend and adds a connection indicator. Firmware transfer and physical switching validation are pending a new U1 configuration connection.
 
-**Subsequent manual feedback confirms that the remote now works as intended.** This supersedes the earlier status awaiting manual feedback after a failed diagnostic connection. The photographs above also confirm the dedicated volume/battery view and native profile menu. The feedback is overall functional acceptance; it does not provide separate timing, current-consumption, or reliability measurements.
+Earlier manual feedback accepted LAB19 for SoundSend use. After adding a new Fire TV profile through the app, a separate failure was reported: Fire TV worked, but returning to SoundSend left a cached percentage without working volume commands. A fresh read confirmed all five profiles, including the new Fire TV profile at slot 5. LAB20's correction is validated offline; repeated physical transitions remain to be tested.
 
-Hardware snapshots confirmed that the inactivity counter continued advancing after radio release. Controls enable automatically on a full boot. The vendor application reports version 32 for this V32-based extension; custom diagnostics identify revision 19. The earlier failed diagnostic query remains recorded in the validation history.
+LAB19's actual boot was verified on 2026-10-27 at 16:42:40 UTC after 7,936 acknowledged transfer blocks. Hardware snapshots confirmed that the inactivity counter continued advancing after radio release. Controls enable automatically on a full boot. The vendor application reports version 32 for this V32-based extension; custom diagnostics distinguish LAB revisions. Historical diagnostics and manual feedback remain in the validation record.
 
 | Capability | Evidence |
 | --- | --- |
 | Direct U1 → SoundSend volume changes | Confirmed through manual testing on earlier installed revisions |
 | One volume step per physical press | Implemented and ARM-tested; up/down operation confirmed through manual testing |
 | Dedicated SoundSend profile | Read back from the remote; other profiles preserved |
+| Fire TV and SoundSend switching | LAB19 failure reported; LAB20 native reconnection regression passes offline; installation and physical confirmation pending |
 | Stable volume screen without profile-menu flash | LAB16 correction confirmed through manual testing |
 | Native inactivity timer after Bluetooth use | Verified advancing on hardware; native sleep path covered offline |
 | Gradual volume repetition while held | LAB19 delayed-response correction tested offline; subsequent overall manual acceptance recorded |
 | Mute and restore previous volume | Implemented and emulation-tested; no separate manual mute/restore checklist recorded |
 | Volume and battery display | Photographed on the physical remote; no instrumented display-latency measurement |
 | Controls enabled after boot | Verified in the actual LAB19 post-update boot; later manual operation reported working |
-| Offline validation | **134 tests passed** for installed LAB19 across seven suites |
+| Offline validation | **139 tests passed** for the LAB20 candidate across seven suites; installed LAB19 previously passed 134 |
 
 See [validation and installation evidence](docs/validation.md) for exact hashes, manual feedback, and measurement limits. Test success is not a claim of universal hardware compatibility or proven recovery.
 
@@ -76,7 +77,7 @@ See [connection, reconnection, and changing devices](docs/connection-and-devices
 
 Select the **SoundSend** profile on the U1 and keep the transmitter powered.
 
-The behavior below describes the installed LAB19 implementation. Subsequent manual feedback reports that the remote works as intended.
+The button behavior below is retained from LAB19. Its reported failure after using Fire TV is addressed by the LAB20 candidate described above.
 
 | Button | Action |
 | --- | --- |
@@ -89,11 +90,14 @@ Holding a volume key repeats gradually after an initial delay. Repeats are paced
 
 Volume keys leave mute starting from the actual zero level. A different controller's intervening volume change is read before the next operation. The remembered mute level survives normal retained sleep, but not battery removal or a full reset. The installed OLED volume label is `Volumen`; repository documentation is English.
 
+The LAB20 candidate adds a top-right link indicator: `...` while connecting, `BT` after receiving a valid volume on the active session, `!` after an error, and blank while idle. The displayed percentage remains the last confirmed value. Because the link closes when idle, the `BT` indicator normally disappears after use. See [Bluetooth profile handoff](docs/bluetooth-profile-handoff.md) for the Fire TV-to-SoundSend correction and its validation scope.
+
 ## Repository guide
 
 | Location | Purpose |
 | --- | --- |
 | [docs/connection-and-devices.md](docs/connection-and-devices.md) | Everyday connection, reconnection, pairing, and using another transmitter or remote |
+| [docs/bluetooth-profile-handoff.md](docs/bluetooth-profile-handoff.md) | Native Bluetooth reconnection race, Fire TV switching, and the live-link indicator |
 | [docs/problem-and-solution.md](docs/problem-and-solution.md) | Requirements, investigation, and design decisions |
 | [docs/architecture.md](docs/architecture.md) | Firmware modules, timing, memory, and integration |
 | [docs/power-management.md](docs/power-management.md) | Inactivity timer regression, sleep restoration, and volume hold behavior |

@@ -1,5 +1,15 @@
 # Validation record
 
+## LAB20 candidate: native Bluetooth handoff
+
+LAB20 / `0x544d524b` / TMRK passed **139 tests across seven suites** and the full-application installer preflight. It ends the native HID reconnect policy before asynchronous radio handoff and adds separate connecting, active-session, and error indicators. The candidate is not yet installed; a fresh U1 configuration connection is required. LAB19 remains the last verified installed revision.
+
+The exact candidate has package SHA-256 `5db5d7f7c48cc4e0cb32b95ef6f4c66a3bb553114316aee63cf4f208a139f34c`, expected application SHA-256 `f3a5c1f8caedee8b01fd4386bfefb5d1c74a3acaa872eceac56292b683921253`, and application-prefix SHA-256 `2483e8d222ae47d896d24084f31bbf770c55f85681fb7a4c5fa40c93ac9dcdcc`.
+
+Before installation, a live read at 2026-10-27 19:13 UTC confirmed LAB19 and five profiles: Proyector (1), SoundSend (2), Android TV (3), HDMI (4), and the newly added Fire TV (5). No old Fire TV backup was restored. The cached volume was 55, with the last central attempt failed at reason `0x08`. This diagnostic does not prove that the reproduced native reconnect race was the only physical failure cause.
+
+The regression executes the original native post-poll HID restart branch with modeled asynchronous disconnect and RF behavior. LAB19 restarted the previous advertiser 27 times in 32 modeled poll iterations; LAB20 acquires the radio and completes the modeled SoundSend operation. Additional cases cover the return to the native HID key path, pairing exclusion, and honest link indicators. Physical Fire TV-to-SoundSend switching and indicator behavior remain unconfirmed for LAB20. See [handoff details](bluetooth-profile-handoff.md) and [candidate evidence](evidence/lab20-candidate-summary.json).
+
 ## Installed candidate
 
 | Item | Value |
@@ -66,7 +76,7 @@ The photographs were copied without image transformations. They show interface c
 
 ## Remaining measurement limits
 
-The installed setup has manual functional acceptance. Separate measured hold/release timing, automatic screen-off timing in each profile, a mute/restore checklist, and display latency were not supplied with that report. Long-duration RF reliability, battery consumption, independent power-cycle behavior over repeated cycles, and recovery after a failed update remain uncharacterized. The photographs do establish that the volume and battery display is present on the physical remote.
+LAB19's earlier SoundSend-only use received manual functional acceptance; the subsequent Fire TV-to-SoundSend failure is recorded above. LAB20 still requires installation and physical switching validation. Separate measured hold/release timing, automatic screen-off timing in each profile, a mute/restore checklist, and display latency were not supplied with the earlier report. Long-duration RF reliability, battery consumption, independent power-cycle behavior over repeated cycles, and recovery after a failed update remain uncharacterized. The photographs establish that the volume and battery display was present on the physical LAB19 remote.
 
 ## Evidence included in Git
 

@@ -18,6 +18,7 @@ static inline unsigned ap_tx_lead_us(const struct a8107_port *p) {return p->radi
 unsigned ap_legacy_state(void);
 unsigned ap_configuration_connected(void);
 unsigned ap_ir_busy(void);
+void ap_prepare_handoff(void);
 void ap_request_idle(void);
 int ap_claim(struct a8107_port *p,unsigned tx_mode);
 void ap_release(struct a8107_port *p);

@@ -1,6 +1,6 @@
 # Connection, reconnection, and changing devices
 
-The installed U1 already knows which SoundSend to control. Normal use requires no pairing procedure or running phone/PC application. LAB19 contains one fixed target address; it does not offer a device-discovery menu or a configurable list of transmitters.
+The installed U1 already knows which SoundSend to control. Normal use requires no pairing procedure or running phone/PC application. The SoundSend extension contains one fixed target address; it does not offer a transmitter-discovery menu or a configurable list of transmitters. Native Bluetooth devices use their separate app-based setup below.
 
 ## Everyday use
 
@@ -35,6 +35,16 @@ Normal control uses a different role: the U1 initiates a BLE connection directly
 
 An active U1 configuration connection takes precedence over custom button handling. Disconnect that session before using the SoundSend controls. Pairing mode is not a step in the everyday procedure.
 
+## Adding a new Fire TV or another native Bluetooth device
+
+Connect the U1 to the SofaBaton app, choose **Add Device / +**, select **Bluetooth**, and choose the new device. Follow its setup assistant to place the U1 in the device-specific pairing mode. Then select the advertised **Sofabaton...** remote from the target device's Bluetooth settings. See the official [U-series device setup guide](https://www.sofabaton.com/2-adding-devices/).
+
+For Fire TV, the target-side path is **Settings → Controllers & Bluetooth Devices → Other Bluetooth Devices → Add Bluetooth Devices**, as shown in the [U1 setup instructions](https://images-na.ssl-images-amazon.com/images/I/A1VQzRg2vuL.pdf). The generic **Pairing...** mode entered with **–** and **E** is the connection to the configuration app; the native device assistant uses **Pairing with...** and its device name.
+
+Adding a new profile does not require restoring an old profile backup. The recorded new Fire TV profile uses internal ID 5, alongside SoundSend at ID 2. Keep the dedicated SoundSend profile in place.
+
+LAB19 exposed a failure when returning from an active Fire TV connection to SoundSend. LAB20 addresses the native reconnect race and adds a link indicator; see [Bluetooth profile handoff](bluetooth-profile-handoff.md) and [validation status](validation.md). The U1 hands over its radio between these control paths rather than maintaining both links simultaneously.
+
 ## Power loss and reconnection
 
 | Situation | Action and expected behavior |
@@ -50,7 +60,7 @@ The initial scan is bounded to three seconds; later connection and protocol stag
 
 ## Using the same U1 with another SoundSend
 
-**Changing the SoundSend target currently requires a new U1 firmware build and OTA installation.** There is no supported address-setting command, learning button, or app screen for this in LAB19. SoundSend itself does not need modified firmware.
+**Changing the SoundSend target currently requires a new U1 firmware build and OTA installation.** There is no supported address-setting command, learning button, or app screen for this in LAB20. SoundSend itself does not need modified firmware.
 
 1. Identify the replacement transmitter. Its app's system-information page can provide a candidate MAC address; verify the actual BLE address and address type rather than selecting a device solely by name.
 2. Verify the [control service, characteristic, and volume protocol](protocol.md). This implementation expects a stable public address and the observed unencrypted interface. A different security requirement or rotating private address needs additional implementation work.
@@ -80,6 +90,6 @@ Check the adapter reported by the scan before continuing; the development setup 
 
 Another U1 requires its own hardware, firmware, identity, and profile checks. This image contains the studied remote's identity in both `own_le` and [build_u1_lab.py](../firmware/build_u1_lab.py); the host tools and installer also enforce the recorded unit. Copying the image unchanged to another remote would duplicate that identity. Adapt the implementation and guards to verified data for the new unit and collect its own installation evidence; do not reuse the existing unit's receipts.
 
-Controlling a different product is a separate protocol implementation, not just an address change. For existing native devices on this U1, select their normal profiles; the SoundSend address does not affect those profiles. A future on-remote transmitter-selection menu would require new firmware work and is not present in LAB19.
+Extending the custom SoundSend client to a different product requires a separate protocol implementation, not just an address change. Devices already supported by the native U1 firmware use the app-based profile setup described above. A future on-remote SoundSend-selection menu would require new firmware work and is not present in LAB20.
 
 Implementation references: [button handling and target selection](../firmware/u1_integration.c), [advertisement address filtering and link lifecycle](../firmware/ble_central.c), and [configuration activation helper](../u1_arm_soundsend.py).

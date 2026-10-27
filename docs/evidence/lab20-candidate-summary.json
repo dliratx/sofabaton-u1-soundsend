@@ -1,0 +1,17 @@
+{
+  "package_sha256": "5db5d7f7c48cc4e0cb32b95ef6f4c66a3bb553114316aee63cf4f208a139f34c",
+  "expected_result_sha256": "f3a5c1f8caedee8b01fd4386bfefb5d1c74a3acaa872eceac56292b683921253",
+  "target_prefix_sha256": "2483e8d222ae47d896d24084f31bbf770c55f85681fb7a4c5fa40c93ac9dcdcc",
+  "result_lab_revision": 20,
+  "result_lab_build_id": "0x544d524b",
+  "result_default_enabled": true,
+  "offline_tests_passed": 139,
+  "offline_suites": 7,
+  "installer_preflight_passed": true,
+  "installed": false,
+  "current_installed_revision": 19,
+  "physical_switching_confirmation_pending": true,
+  "validated_at": "2026-10-27T19:35:35.550193+00:00",
+  "regression": "The original native post-poll HID retry branch restarted the previous advertiser 27 times in 32 modeled poll iterations. LAB20 ends that retry policy before asynchronous handoff.",
+  "scope": "Compiled ARM and host validation, with modeled radio and hardware. Physical Fire TV-to-SoundSend switching remains to be tested after installation."
+}

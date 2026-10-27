@@ -1,5 +1,14 @@
 # Change log
 
+## LAB20 — Native Bluetooth handoff and connection feedback
+
+- End the previous native HID retry policy before asynchronous radio acquisition, preventing the original main loop from restarting the Fire TV advertiser between SoundSend polls.
+- Preserve native profile records and the HID key path; yield custom keys during app and device-pairing screens.
+- Add connecting, active-session, and failure indicators separate from the cached volume percentage, within the existing display timing budget and 424-byte retained state.
+- Accept additional native device profiles in the physical-key activation helper while retaining the exact SoundSend profile guard.
+- Passed 139 offline tests and exact-package installer preflight. Installation and physical switching validation are pending; LAB19 remains installed.
+- Document app-based creation of a new Fire TV profile and distinguish it from U1 configuration pairing.
+
 ## Documentation — Hardware photos and connection guide
 
 - Added three original photographs showing the SoundSend display, native profile menu, and U1 rear label.

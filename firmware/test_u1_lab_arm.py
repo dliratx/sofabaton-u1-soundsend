@@ -45,6 +45,7 @@ class Machine(ArmClient):
         self.battery_level=85;self.battery_reads=0;self.separator_clears=0
         self.stub_ascii=True;self.screen_times=[];self.screen_delay=0
         self.native_sleep_fixture=False;self.sleep_entries=0
+        self.native_main_fixture=False;self.native_hid_restarts=0
         self.machine.hook_add(UC_HOOK_CODE,self.code)
         self.machine.hook_add(UC_HOOK_MEM_READ,self.read)
         self.machine.hook_add(UC_HOOK_MEM_WRITE,self.write)
@@ -66,6 +67,12 @@ class Machine(ArmClient):
         self.machine.reg_write(UC_ARM_REG_PC,self.machine.reg_read(UC_ARM_REG_LR))
     def code(self,uc,pc,size,data):
         self.clock+=1
+        if self.native_main_fixture:
+            if pc in (0x12A60,0x7078,0x2958,0x2964):self.ret();return
+            if pc==0x87D8:
+                self.native_hid_restarts+=1;self.put8(0x20000270,1);self.put8(0x20000163,1)
+                uc.mem_write(0x20002CEC,struct.pack('<BBHHBBBB',7,0,640,10000,0,1,1,0))
+                self.ret();return
         if self.native_sleep_fixture:
             if pc==0x10A4:self.ret();return
             if pc==0x123C:self.sleep_entries+=1;uc.emu_stop();return
@@ -290,6 +297,17 @@ class Machine(ArmClient):
         self.call('stock_idle_tick')
         return True
 
+    def native_after_poll(self):
+        # Execute the original main loop after its poll call. In particular,
+        # C8=0x82/0x514 requests HID reconnection even after LL disconnect.
+        # Model only the HID advertiser and unrelated sleep/service entries.
+        self.native_main_fixture=True
+        self.machine.reg_write(UC_ARM_REG_SP,self.call_stack-0x80)
+        self.machine.emu_start(0xCE71,0xD886,count=100000)
+        self.native_main_fixture=False
+        if self.machine.reg_read(UC_ARM_REG_PC)!=0xD886:
+            raise AssertionError(f'Native post-poll fragment stopped at {self.machine.reg_read(UC_ARM_REG_PC):#x}')
+
     def native_sleep_entry(self):
         # Execute the original inactivity decision and GPIO/timer shutdown.
         # Stop at the low-power service entry; no physical sleep is modeled.
@@ -303,6 +321,62 @@ class Machine(ArmClient):
 
 class IntegrationTests(unittest.TestCase):
     def setUp(self):self.m=Machine()
+    def test_soundsend_acquisition_stops_native_hid_reconnect_loop(self):
+        for timeout in (0x82,0x514):
+            with self.subTest(timeout=timeout):
+                m=Machine();m.debug(3,1);m.put8(0x200000ba,120)
+                m.put32(0x200000c8,timeout);m.put8(0x20000270,3);m.put8(0x20000163,2)
+                m.put8(0x200000bb,3);m.put8(0x20000166,5);m.put8(0x20000167,5)
+                m.put8(0x200000c1,5);m.put8(0x200000c2,7)
+                profile_before=bytes(m.machine.mem_read(0x20001434,32))
+                m.disconnect_delay=5;m.key(2,4)
+                for _ in range(32):
+                    m.poll()
+                    if m.machine.mem_read(0x20000270,1)==b'\0':m.native_after_poll()
+                    if m.debug(1)[5]==2:break
+                self.assertEqual(m.native_hid_restarts,0,'Native HID must not reacquire the radio while SoundSend waits')
+                self.assertEqual(m.debug(1)[5],2,'SoundSend must acquire the released radio')
+                state=m.run_until_idle()
+                self.assertEqual(state[7],0);self.assertEqual(m.peer.writes,[19])
+                self.assertEqual(m.u32(0x200000c8),120,'Release must retain the native inactivity threshold')
+                self.assertEqual(bytes(m.machine.mem_read(0x200000c1,2)),b'\xff\xff','Do not replay an old Fire TV key')
+                self.assertEqual(bytes(m.machine.mem_read(0x20001434,32)),profile_before)
+    def test_return_to_hid_profile_starts_the_original_connection_path(self):
+        m=self.m;m.debug(3,1);m.key(2,4);m.run_until_idle()
+        m.stub_key=False;m.original_key_fixture=True;m.native_main_fixture=True
+        self.assertEqual(m.key(5,4),0)
+        self.assertEqual(m.native_hid_restarts,1)
+        self.assertEqual(m.u32(0x200000c8),0x82)
+        self.assertEqual(bytes(m.machine.mem_read(0x200000c1,2)),bytes([5,4]))
+        self.assertEqual(m.peer.writes,[19],'The native profile must not issue a SoundSend command')
+    def test_device_pairing_and_app_pairing_do_not_start_soundsend(self):
+        for mode,screen in ((0,1),(0,2),(3,0)):
+            with self.subTest(mode=mode,screen=screen):
+                m=Machine();m.debug(3,1);m.put8(0x20000163,mode)
+                m.put8(0x20000162,screen);m.put8(0x20000270,1)
+                self.assertEqual(m.key(2,4),7)
+                m.poll();self.assertEqual(m.debug(1)[5],0);self.assertEqual(m.tx,[])
+    def test_link_indicator_requires_a_confirmed_session_and_clears_when_idle(self):
+        m=self.m;m.call('u1_screen_gateway');m.debug(3,1);m.key(2,4);m.poll()
+        self.assertIn((104,0,'...'),m.screen_lines)
+        self.assertNotIn((104,0,' BT'),m.screen_lines,'A queued action does not prove a working link')
+        m.run_until_idle()
+        self.assertIn((104,0,' BT'),m.screen_lines)
+        self.assertEqual(m.screen_lines[-3],(0,0,'SoundSend       '))
+        self.assertIn('19 %',m.screen_lines[-2][2])
+    def test_link_failure_marks_cached_volume_without_claiming_a_connection(self):
+        m=self.m;m.call('u1_screen_gateway');m.debug(3,1);m.key(2,4);m.run_until_idle()
+        before=len(m.screen_lines);m.constant_rssi=True;m.key(2,4)
+        # A second operation first stops native advertising asynchronously.
+        # Wait for the attempted acquisition to finish before inspecting its error.
+        for _ in range(8):
+            m.call('u1_poll_gateway',1,2,3,4,instruction_limit=2500000)
+            if m.debug(1)[5]==0:break
+        self.assertEqual(m.debug(1)[7],0x82)
+        self.assertIn((104,0,'...'),m.screen_lines[before:])
+        self.assertNotIn((104,0,' BT'),m.screen_lines[before:])
+        self.assertEqual(m.screen_lines[-3],(0,0,'SoundSend     ! '))
+        self.assertIn('19 %',m.screen_lines[-2][2])
     def test_inactivity_timer_and_pending_tick_survive_radio_ownership(self):
         m=self.m;m.put32(0x50006010,0x333);m.put32(0x50006014,0xe7)
         m.debug(2);m.poll()
@@ -349,7 +423,7 @@ class IntegrationTests(unittest.TestCase):
         before=bytes(m.machine.mem_read(0x200000c4,8))
         state=decode_response(m.debug(14),14)
         self.assertEqual((state['idle_ticks'],state['idle_timeout_ticks'],state['screen_mode']),(7,10,3))
-        self.assertTrue(state['inactivity_timer_running']);self.assertEqual(state['lab_protocol_revision'],19)
+        self.assertTrue(state['inactivity_timer_running']);self.assertEqual(state['lab_protocol_revision'],20)
         self.assertEqual(bytes(m.machine.mem_read(0x200000c4,8)),before)
         self.assertEqual(m.u32(0x50006014),0xe7)
     def test_held_volume_repeats_at_bounded_rate_and_stops_on_release(self):
@@ -567,7 +641,7 @@ class IntegrationTests(unittest.TestCase):
         self.assertIn((96,6,'MUTE'),m.screen_lines)
     def test_native_partial_oled_renderer_is_bounded_and_fits_stack(self):
         m=self.m;m.stub_ascii=False;m.symbols['native_ascii']=0x11DC9
-        for text,x,page in [(b'100\0',72,3),(b'MUTE\0',96,6)]:
+        for text,x,page in [(b'100\0',72,3),(b'MUTE\0',96,6),(b' BT\0',104,0)]:
             m.machine.mem_write(INPUT,text);start=m.clock;m.call('native_ascii',x,page,INPUT)
             # Budget4 timer ticks per executed instruction. Only one partial
             # renderer call is permitted before the idle-window check repeats.
@@ -652,8 +726,8 @@ class IntegrationTests(unittest.TestCase):
         sys.path.insert(0,str(ROOT.parent))
         from u1_debug import decode_response
         state=decode_response(self.m.debug(5),5)
-        self.assertEqual(state['build_id'],'0x544d524a')
-        self.assertEqual(state['lab_protocol_revision'],19)
+        self.assertEqual(state['build_id'],'0x544d524b')
+        self.assertEqual(state['lab_protocol_revision'],20)
         self.assertEqual(state['clock_before'],0);self.assertEqual(state['clock_after'],0)
         self.assertEqual(state['port_error'],0);self.assertEqual(self.m.tx,[])
     def test_read_only_radio_snapshot_does_not_start_radio(self):
@@ -662,7 +736,7 @@ class IntegrationTests(unittest.TestCase):
         from u1_debug import decode_response
         state=decode_response(self.m.debug(6),6)
         self.assertEqual(state['rf_status'],'0x0');self.assertEqual(state['rf_header'],'0x0')
-        self.assertEqual(state['rf_control'],'0x0');self.assertEqual(state['lab_protocol_revision'],19)
+        self.assertEqual(state['rf_control'],'0x0');self.assertEqual(state['lab_protocol_revision'],20)
         self.assertEqual(self.m.tx,[])
     def test_lab_mode3_matches_stock_ble_control_before_rx(self):
         m=self.m;m.symbols['stock_ble_control_start']=0x6CD
@@ -700,7 +774,7 @@ class IntegrationTests(unittest.TestCase):
         self.assertEqual(state[7],0x86)
         tx=decode_response(m.debug(7),7)
         self.assertEqual(tx['intended_tx_header'],'0x2205');self.assertEqual(tx['tx_mode'],4)
-        self.assertEqual(tx['lab_protocol_revision'],19);self.assertEqual(tx['port_error'],0x86)
+        self.assertEqual(tx['lab_protocol_revision'],20);self.assertEqual(tx['port_error'],0x86)
         self.assertEqual(m.tx,[])
     def test_execute_original_advertising_fragment_records_engine_header_then_fifo(self):
         m=self.m

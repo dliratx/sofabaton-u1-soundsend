@@ -20,7 +20,7 @@ def request_packet(command,argument=0):
 
 def decode_response(packet,command):
     p=bytes(packet)
-    if len(p)!=20 or p[:4]!=bytes([0x53,0x53,1,command|0x80]) or sum(p[:19])&255!=p[19] or p[18] not in range(1,20):
+    if len(p)!=20 or p[:4]!=bytes([0x53,0x53,1,command|0x80]) or sum(p[:19])&255!=p[19] or p[18] not in range(1,21):
         raise ValueError('Response is not from the custom firmware or has an invalid checksum')
     if command==14:
         if p[18]<18:raise ValueError('Power diagnostics require LAB18')
