@@ -81,7 +81,7 @@ def create_image():
             "main_stack_limit":hex(symbols['__ss_stack_limit']),"main_stack_top":hex(symbols['__ss_stack_top']),
             "lab_disabled_on_reset":False,"soundSend_firmware_modified":False,
             "boot_radio_configuration":{"tx_mode":10,"rx_clear_mode":2,"tx_lead_us":72},
-            "lab_protocol_revision":20,"lab_build_id":"0x544d524b",
+            "lab_protocol_revision":21,"lab_build_id":"0x544d524c",
             "preserved_device_address":"20:21:03:00:2E:AB",
             "physical_radio_validation":False,"ota_package_generated":False,"installed":False,
             "scope":"Offline experimental image. Radio launch modes, IRQ/main-loop interactions and recovery remain unverified on physical hardware."}

@@ -1,8 +1,8 @@
 #ifndef SS_U1_INTEGRATION_H
 #define SS_U1_INTEGRATION_H
 #include <stdint.h>
-#define SS_LAB_REVISION 20
-#define SS_LAB_BUILD_ID 0x544d524bu
+#define SS_LAB_REVISION 21
+#define SS_LAB_BUILD_ID 0x544d524cu
 void u1_runtime_init(void);
 unsigned u1_key_gateway(unsigned profile,unsigned button);
 unsigned u1_poll_gateway(unsigned a,unsigned b,unsigned c,unsigned d);

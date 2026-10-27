@@ -8,6 +8,7 @@
 #define R16(a) (*(volatile uint16_t *)(uintptr_t)(a))
 #define R32(a) (*(volatile uint32_t *)(uintptr_t)(a))
 #define US(x) ((uint32_t)(x)*16u)
+#define CONTROL_IDLE_US 10000000u
 extern unsigned u1_original_key(unsigned profile,unsigned button);
 extern unsigned u1_original_poll(unsigned a,unsigned b,unsigned c,unsigned d);
 extern void u1_original_screen(void);
@@ -26,6 +27,7 @@ struct u1_runtime {
     uint8_t muted:1,shown_muted:1,screen_valid:1,repeating:1,shown_link:2;
 };
 static struct u1_runtime runtime;
+static void finish(unsigned reason);
 static const uint8_t own_le[6]={0xab,0x2e,0x00,0x03,0x21,0x20};
 static const uint8_t peer_le[6]={0x0a,0x93,0x18,0x93,0x90,0xcc};
 static unsigned soundsend_profile(unsigned profile) {
@@ -112,6 +114,7 @@ void u1_screen_gateway(void) {
     }
     /* Other devices, configuration and invalid/hidden selections retain
      * the stock selection repair and native screen behavior. */
+    if(!runtime.probe && (runtime.phase!=RT_IDLE || runtime.request)) finish(0);
     runtime.screen_valid=0;u1_original_screen();show_volume();
 }
 
@@ -327,13 +330,18 @@ static void active_poll(void) {
     if(client_before!=SS_READY && runtime.central.client.state==SS_READY)
         runtime.last_key=now;
     apply_mute();show_confirmed_change();
-    if(runtime.central.client.state==SS_READY && (uint32_t)(now-runtime.last_key)>=US(800000))
+    if(runtime.central.client.state==SS_READY && (uint32_t)(now-runtime.last_key)>=US(CONTROL_IDLE_US))
         bc_disconnect(&runtime.central,now);
 }
 unsigned u1_poll_prepare(void) {
     /* The assembly gateway tail-calls stock poll after this function returns.
      * Its dedicated OTA loop must not retain an extra C frame on the small
      * original stack. Return0 only while the new central owns this iteration. */
+    /* A longer ready interval must not retain the radio after wheel selection
+     * changes the profile, or while native pairing/configuration takes over. */
+    if(!runtime.probe && (runtime.phase!=RT_IDLE || runtime.request) && !volume_screen_selected()) {
+        finish(0);return 1;
+    }
     if(runtime.phase==RT_ACTIVE) {active_poll();return 0;}
     if(!runtime.request) return 1;
     if(!runtime.probe && ap_configuration_connected()) {finish(0x92);return 1;}

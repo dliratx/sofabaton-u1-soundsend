@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "native_key_down_and_release_executed": true,
+  "pause_seconds": 9,
+  "volume_writes": [
+    19,
+    20
+  ],
+  "connections": 1,
+  "scope": "Supplemental execution of the original key dispatcher through press, release, nine-second pause, and second press with modeled RF.",
+  "module_sha256": "80f2d9048cde9ea40b7b059c5aae0d04e0940a6cfebbaddbf3de8fc81abb7098",
+  "image_sha256": "1f292893c31843c04f1a2b9a942500c3fe4e6515ed4a195b3a7d381776f8c588"
+}

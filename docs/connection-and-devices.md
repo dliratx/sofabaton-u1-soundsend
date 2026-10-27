@@ -9,11 +9,11 @@ The installed U1 already knows which SoundSend to control. Normal use requires n
 3. Select the existing **SoundSend** profile with the U1's device-selection wheel.
 4. Press volume up, volume down, or mute. Hold a volume button for gradual repetition.
 
-The U1 scans for the configured transmitter when a control action needs a connection. It discovers the control service, subscribes to notifications, reads the actual volume, and applies the requested change. A ready connection is kept for approximately 800 ms after the last accepted key or completed operation, allowing subsequent presses and held-key repeats to reuse it. After that idle interval, it disconnects and returns radio ownership to the native firmware.
+The U1 scans for the configured transmitter when a control action needs a connection. It discovers the control service, subscribes to notifications, reads the actual volume, and applies the requested change. A ready connection is kept for approximately 10 seconds after the last accepted key or completed operation, allowing subsequent presses and held-key repeats to reuse it. After that idle interval, it disconnects and returns radio ownership to the native firmware. Selecting another profile or entering native pairing releases the session without waiting for the timeout.
 
 There is no need to keep the Bluetooth link permanently open. The next control press starts a new connection when necessary. The OLED shows the last confirmed volume; while disconnected, it is not a continuously refreshed monitor of changes made by another controller.
 
-It is normal for the remote to connect when volume is pressed. `...` means the connection is being established; `BT` means the active session has received a valid volume. `BT` disappears when the idle connection closes, and the next press reconnects to the same address. This does not repeat device setup or pairing. A connection left idle is released so the native firmware can use the radio for other profiles.
+It is normal for the remote to connect when volume is pressed. `...` means the connection is being established; `BT` means the active session has received a valid volume. `BT` remains visible during the 10-second ready interval and disappears when the idle connection closes. The next press reconnects to the same address without repeating device setup or pairing.
 
 ## What was configured
 
@@ -64,7 +64,7 @@ If `!` appears and the SoundSend app also cannot discover the powered transmitte
 
 ## Using the same U1 with another SoundSend
 
-**Changing the SoundSend target currently requires a new U1 firmware build and OTA installation.** There is no supported address-setting command, learning button, or app screen for this in LAB20. SoundSend itself does not need modified firmware.
+**Changing the SoundSend target currently requires a new U1 firmware build and OTA installation.** There is no supported address-setting command, learning button, or app screen for this in LAB21. SoundSend itself does not need modified firmware.
 
 1. Identify the replacement transmitter. Its app's system-information page can provide a candidate MAC address; verify the actual BLE address and address type rather than selecting a device solely by name.
 2. Verify the [control service, characteristic, and volume protocol](protocol.md). This implementation expects a stable public address and the observed unencrypted interface. A different security requirement or rotating private address needs additional implementation work.
@@ -94,6 +94,6 @@ Check the adapter reported by the scan before continuing; the development setup 
 
 Another U1 requires its own hardware, firmware, identity, and profile checks. This image contains the studied remote's identity in both `own_le` and [build_u1_lab.py](../firmware/build_u1_lab.py); the host tools and installer also enforce the recorded unit. Copying the image unchanged to another remote would duplicate that identity. Adapt the implementation and guards to verified data for the new unit and collect its own installation evidence; do not reuse the existing unit's receipts.
 
-Extending the custom SoundSend client to a different product requires a separate protocol implementation, not just an address change. Devices already supported by the native U1 firmware use the app-based profile setup described above. A future on-remote SoundSend-selection menu would require new firmware work and is not present in LAB20.
+Extending the custom SoundSend client to a different product requires a separate protocol implementation, not just an address change. Devices already supported by the native U1 firmware use the app-based profile setup described above. A future on-remote SoundSend-selection menu would require new firmware work and is not present in LAB21.
 
 Implementation references: [button handling and target selection](../firmware/u1_integration.c), [advertisement address filtering and link lifecycle](../firmware/ble_central.c), and [configuration activation helper](../u1_arm_soundsend.py).

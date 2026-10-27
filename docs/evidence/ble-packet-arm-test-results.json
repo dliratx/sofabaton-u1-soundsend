@@ -2,7 +2,7 @@
   "tests_run": 8,
   "passed": true,
   "source": "https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Core-62/out/en/low-energy-controller/sample-data.html",
-  "module_sha256": "94dc7cd509808832e41cbd0326fd17c781e3aeaea3acf115612084123f2ade44",
-  "image_sha256": "66413044e2e4e85505fc06d6307768bb99fcef4281f52e8c21c39af0140cc91f",
+  "module_sha256": "80f2d9048cde9ea40b7b059c5aae0d04e0940a6cfebbaddbf3de8fc81abb7098",
+  "image_sha256": "1f292893c31843c04f1a2b9a942500c3fe4e6515ed4a195b3a7d381776f8c588",
   "scope": "ARM CRC/whitening against primary Bluetooth SIG vectors; not physical RF proof."
 }

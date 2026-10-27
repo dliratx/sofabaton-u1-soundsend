@@ -22,7 +22,7 @@ The radio port now leaves LPTIMER1 running. IRQ24 remains masked during precise 
 
 The separate 16 MHz Timer1 used for BLE scheduling is still stopped when its discarded link is released. The extension does not replace the native inactivity threshold or add an always-running display timer.
 
-Volume repetition uses the active BLE clock. A new physical press requests one step. Held volume keys repeat after an initial 400 ms delay, then at intervals of at least 120 ms, only after the preceding operation is confirmed. There is no timed repeat queue while connecting or awaiting a write confirmation. Mute toggles once per physical press. The warm connection interval is bounded to 800 ms after the last accepted operation.
+Volume repetition uses the active BLE clock. A new physical press requests one step. Held volume keys repeat after an initial 400 ms delay, then at intervals of at least 120 ms, only after the preceding operation is confirmed. There is no timed repeat queue while connecting or awaiting a write confirmation. Mute toggles once per physical press. LAB18 originally bounded the warm connection interval to 800 ms after the last accepted operation.
 
 ## Delayed response defect and LAB19
 
@@ -32,9 +32,17 @@ LAB18 measured idle time from the initial request or radio acquisition. If disco
 
 LAB19 restarts that interval when the ATT client transitions to `SS_READY`, before checking for idle closure. A held key receives its initial 400 ms ready window and subsequent repeats wait at least 120 ms after confirmation. Separate presses can reuse the connection for 800 ms after the last accepted key or completed operation. Failed or unanswered operations retain their existing bounded timeouts; an unconfirmed write never starts a repeat.
 
+## LAB21: ten seconds between adjustments
+
+LAB21 extends the control-connection idle interval to 10 seconds after the last accepted operation or successful discovery/write confirmation. A new adjustment renews the interval. The ready link stays available while listening between presses, and the `BT` indicator remains visible until the connection closes or another profile is selected.
+
+Profile selection and native pairing cancel the control session without waiting for the 10-second timeout. The native screen renderer runs after radio ownership has been released. The previous cancellation path for other native keys is retained. The longer interval does not alter the held-key repeat delays, volume step, or native inactivity threshold. Its effect on battery consumption has not been measured.
+
 ## Verification
 
 Regression tests reproduce the stopped inactivity timer and absent hold repetition in the LAB17 image. The LAB18 tests exercise preservation of the timer and pending interrupt, the original ARM inactivity handler, and the original sleep decision after both a volume operation and a profile change. Failure and cancellation paths, volume bounds, release behavior, mute, and connection reuse are also covered.
+
+LAB21 adds checks for a ready connection lasting 10 seconds before termination, reuse after a 9-second pause, renewal after the next confirmation, and immediate release for profile selection or pairing. The emulation advances through empty intervals between connection events while still executing each modeled TX/RX exchange and the firmware's actual timeout logic.
 
 The sleep test stops at the native low-power service entry. It does not simulate electrical sleep current or prove battery life. Current installation results and outstanding physical checks are recorded in [validation.md](validation.md).
 

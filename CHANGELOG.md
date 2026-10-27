@@ -1,5 +1,12 @@
 # Change log
 
+## LAB21 — Ten-second connection reuse
+
+- Extend the ready control connection from 800 ms to 10 seconds after the last accepted operation or confirmation. A new adjustment renews the interval.
+- Release the active or queued session on profile changes and native pairing; restore radio ownership before rendering another native screen.
+- Retain volume-step, held-key repetition, mute, radio defaults, and the existing 424-byte extension state.
+- Passed 143 offline tests, including four new integration cases. Installed with 7,936 acknowledged blocks; actual LAB21 boot, enabled defaults, and all five unchanged profile records verified. Physical interval confirmation is pending.
+
 ## LAB20 — Native Bluetooth handoff and connection feedback
 
 - End the previous native HID retry policy before asynchronous radio acquisition, preventing the original main loop from restarting the Fire TV advertiser between SoundSend polls.

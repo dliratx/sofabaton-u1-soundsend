@@ -1,0 +1,21 @@
+{
+  "package_sha256": "d03fda81bba147c0d64cf6e9c0051d7f8ad88b3216b160ab374354709cf3f8a2",
+  "expected_result_sha256": "c244e65166bf5b74ca89f4035c1de02041ae601126770a6df8acf40ace48aac7",
+  "target_prefix_sha256": "359cc5eb1badf7ed9b0d1b2a4a1764cb73e962cca369c01e448dd6b9b50b50d6",
+  "result_lab_revision": 21,
+  "result_lab_build_id": "0x544d524c",
+  "result_default_enabled": true,
+  "offline_tests_passed": 143,
+  "offline_suites": 7,
+  "installer_preflight_passed": true,
+  "installed": true,
+  "current_installed_revision": 21,
+  "control_idle_seconds": 10,
+  "physical_ten_second_confirmation_pending": true,
+  "validated_at": "2026-10-27T20:33:29.142658+00:00",
+  "regression": "Ten-second ready timeout, reuse after a nine-second pause, renewal after confirmation, and immediate profile/pairing exit are exercised by compiled ARM code.",
+  "scope": "Offline validation of the exact installed package. Actual boot and profile preservation are recorded separately. Physical confirmation of ten-second reuse remains pending.",
+  "supplemental_native_release_check": "lab21-native-release-check.json",
+  "actual_boot_verified_at": "2026-10-27T21:15:05.709829+00:00",
+  "installation_evidence": "lab21-installation-summary.json"
+}

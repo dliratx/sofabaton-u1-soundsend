@@ -19,9 +19,9 @@ from firmware.build_delta_lab import STATE
 async def run(args):
     expected = json.loads(STATE.read_text())
     revision=expected.get('lab_protocol_revision');build=expected.get('lab_build_id')
-    if ({15:'0x544d5246',16:'0x544d5247',17:'0x544d5248',18:'0x544d5249',19:'0x544d524a',20:'0x544d524b'}.get(revision)!=build or
+    if ({15:'0x544d5246',16:'0x544d5247',17:'0x544d5248',18:'0x544d5249',19:'0x544d524a',20:'0x544d524b',21:'0x544d524c'}.get(revision)!=build or
         not expected.get('boot_and_control_plane_verified')):
-        raise RuntimeError('Only a verified physical LAB15 through LAB20 build may be armed by this script')
+        raise RuntimeError('Only a verified physical LAB15 through LAB21 build may be armed by this script')
     with args.output.open('x', encoding='utf8') as log:
         def record(event, **fields):
             row = dict(time=datetime.now(timezone.utc).isoformat(), event=event, **fields)
@@ -32,7 +32,7 @@ async def run(args):
                 record('identity', **await read_identity(client))
                 state = await exchange(client, 1)
                 record('before', **state)
-                if state['lab_protocol_revision'] != revision or (state['enabled'] and revision not in (17,18,19,20)) or state['phase'] != 'idle':
+                if state['lab_protocol_revision'] != revision or (state['enabled'] and revision not in (17,18,19,20,21)) or state['phase'] != 'idle':
                     raise RuntimeError(f'Expected disabled/idle LAB{revision}')
                 clock = await exchange(client, 5)
                 record('build', **clock)
@@ -69,7 +69,7 @@ async def run(args):
                 except Exception as error:
                     record('configuration_disconnect_ack_missing', error=f'{type(error).__name__}: {error}')
                 await asyncio.sleep(1)
-                record('armed_for_physical_test', firmware_revision=revision, daily_boot_default_enabled=revision in (17,18,19,20),
+                record('armed_for_physical_test', firmware_revision=revision, daily_boot_default_enabled=revision in (17,18,19,20,21),
                        expected_step=1, radio_mode=10, tx_lead_us=72, confirmed_baseline_volume=state['volume'],
                        pc_soundSend_connection=False, pc_volume_write=False, firmware_data_written=False)
         except BaseException as error:

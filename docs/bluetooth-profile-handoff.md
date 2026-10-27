@@ -34,12 +34,14 @@ The top-right corner of the SoundSend view distinguishes the connection state fr
 | `!` | The last attempt ended with an error; the displayed percentage may be an earlier confirmed value. |
 | Blank | No active SoundSend control session. The next volume or mute press reconnects as needed. |
 
-The link closes about 800 ms after the last accepted operation or confirmation, so `BT` normally disappears shortly after control activity stops. Selecting SoundSend alone shows the last confirmed volume. Pressing volume or mute establishes a connection when needed; successive presses and held-volume repetition reuse it while active. This is a connection to the already configured address, not a new pairing exchange. The indicator uses the existing bounded display-update window; no display or ADC work is added to the scanning or packet-launch path.
+LAB21 keeps the link available for 10 seconds after the last accepted operation or confirmation, extending LAB20's 800 ms interval. `BT` stays visible during that active session and disappears when it closes. Selecting SoundSend alone shows the last confirmed volume. Pressing volume or mute establishes a connection when needed; successive presses and held-volume repetition reuse it while active. This is a connection to the already configured address, not a new pairing exchange. The indicator uses the existing bounded display-update window; no display or ADC work is added to the scanning or packet-launch path.
+
+Selecting another profile or entering native pairing releases the control session before the 10-second interval expires. Native screen rendering and control can then use the restored radio path.
 
 ## Validation scope
 
 Regression coverage includes acquisition after asynchronous HID disconnect, the original post-poll reconnection decision, return to the native HID key path, pairing-mode exclusion, and successful/failed connection indicators. The ordinary inactivity, held-volume, mute, display timing, and OTA checks remain part of the full build.
 
-The HID advertiser and RF peer are modeled in these tests. After installation, an initial scan timeout coincided with SoundSend being undiscoverable to both the UGREEN adapter and the iPhone. Advertisements returned after a transmitter restart, and subsequent manual feedback confirmed Fire TV/SoundSend switching and volume control. This is functional acceptance; long-duration reliability and instrumented timing remain unmeasured. Installation, diagnostics, and manual feedback are recorded separately in [validation.md](validation.md).
+The HID advertiser and RF peer are modeled in these tests. After LAB20 installation, an initial scan timeout coincided with SoundSend being undiscoverable to both the UGREEN adapter and the iPhone. Advertisements returned after a transmitter restart, and subsequent manual feedback confirmed Fire TV/SoundSend switching and volume control. That acceptance applies to LAB20; LAB21's longer interval has its own validation record. Long-duration reliability and instrumented timing remain unmeasured. Installation, diagnostics, and manual feedback are recorded separately in [validation.md](validation.md).
 
 For daily use and adding a new Bluetooth device through the app, see [connection and changing devices](connection-and-devices.md).

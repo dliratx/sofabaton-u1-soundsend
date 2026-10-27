@@ -27,8 +27,8 @@ def validated_package(expected=None):
     raw=(ROOT/'firmware/u1-v32-lab-offline.bin').read_bytes()
     if hashlib.sha256(raw).hexdigest()!=manifest['raw_image_sha256'] or raw[:APPLICATION_END]!=application:
         raise ValueError('Package, image, and manifest are inconsistent')
-    daily=({17:'0x544d5248',18:'0x544d5249',19:'0x544d524a',20:'0x544d524b'}.get(manifest.get('lab_protocol_revision'))==manifest.get('lab_build_id') and
-           manifest.get('lab_protocol_revision') in (17,18,19,20) and
+    daily=({17:'0x544d5248',18:'0x544d5249',19:'0x544d524a',20:'0x544d524b',21:'0x544d524c'}.get(manifest.get('lab_protocol_revision'))==manifest.get('lab_build_id') and
+           manifest.get('lab_protocol_revision') in (17,18,19,20,21) and
            manifest.get('boot_radio_configuration')=={'tx_mode':10,'rx_clear_mode':2,'tx_lead_us':72})
     if (not manifest['lab_disabled_on_reset'] and not daily) or manifest['soundSend_firmware_modified']:
         raise ValueError('Unexpected boot configuration or SoundSend firmware change')

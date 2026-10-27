@@ -1,5 +1,40 @@
 # Validation record
 
+## Installed candidate
+
+| Item | Value |
+| --- | --- |
+| Custom revision | LAB21 |
+| Build ID | `0x544d524c` / TMRL |
+| Actual post-update boot | 2026-10-27 21:15:05 UTC |
+| Vendor-reported firmware | 32 |
+| Controls enabled on boot | Verified true |
+| Control-connection idle interval | 10 seconds |
+| Radio defaults | Mode 10, RX-clear 2, TX lead 72 µs |
+| Offline suites | 7 |
+| Offline tests passed | 143 |
+| Full-transfer acknowledgements | 7,936 / 7,936 |
+| SoundSend firmware changes | None |
+
+```text
+OTA package SHA-256
+d03fda81bba147c0d64cf6e9c0051d7f8ad88b3216b160ab374354709cf3f8a2
+
+Expected installed application SHA-256
+c244e65166bf5b74ca89f4035c1de02041ae601126770a6df8acf40ace48aac7
+
+Application prefix SHA-256
+359cc5eb1badf7ed9b0d1b2a4a1764cb73e962cca369c01e448dd6b9b50b50d6
+```
+
+The expected installed hash is derived from the acknowledged candidate plus verified custom boot. It is **not** a full physical readback or firmware dump.
+
+## LAB21: ten-second control connection
+
+LAB21 / `0x544d524c` / TMRL passed **143 tests across seven suites** and exact-package installer preflight. It was installed with all 7,936 blocks acknowledged; actual boot and enabled defaults were verified on 2026-10-27 at 21:15:05 UTC. All five profile records were read back unchanged and the native configuration disconnect was acknowledged. See [installation evidence](evidence/lab21-installation-summary.json) and [candidate evidence](evidence/lab21-candidate-summary.json).
+
+The new ARM cases verify a ready connection lasting 10 seconds, reuse after a 9-second pause, renewal after confirmation, and release before native profile-screen/key handling or pairing. A [supplemental check](evidence/lab21-native-release-check.json) executes the original native key dispatcher through press, release, a 9-second pause, and a second press on one modeled connection; it is separate from the 143-test count. Existing held-volume, mute, display, timer, sleep, and OTA checks also pass. The longer interval retains 424 bytes of extension state. Physical confirmation of the longer pause and return to Fire TV remains pending; LAB20 manual acceptance below is historical evidence.
+
 ## LAB20 installation: native Bluetooth handoff
 
 LAB20 / `0x544d524b` / TMRK passed **139 tests across seven suites** and the full-application installer preflight. It ends the native HID reconnect policy before asynchronous radio handoff and adds separate connecting, active-session, and error indicators. The package was installed with 7,936 acknowledged blocks. Actual LAB20 boot and enabled radio defaults were verified on 2026-10-27 at 19:44:04 UTC. A subsequent read confirmed all five profile records unchanged and enabled controls; the native configuration disconnect was acknowledged. See [installation evidence](evidence/lab20-installation-summary.json).
@@ -13,34 +48,6 @@ The regression executes the original native post-poll HID restart branch with mo
 The first LAB20 manual attempt displayed `!` and did not control SoundSend. Diagnostics showed scan timeout `0x08`, zero transmitted packets, and no confirmed volume. A 15-second UGREEN scan found 16 nearby devices but not the exact SoundSend address; the iPhone also could not find the powered transmitter. SoundSend advertisements reappeared after a transmitter restart was announced. The scan was passive and did not connect the PC to SoundSend. This identifies unavailability during that attempt, without establishing why advertising stopped. See [manual feedback and discovery evidence](evidence/lab20-manual-feedback.json).
 
 On 2026-10-27, subsequent manual feedback confirmed that the setup works as intended in response to a requested three-cycle SoundSend → Fire TV → SoundSend check with volume control after returning. This records functional acceptance of switching and volume control; no independent cycle count or instrumented timing trace accompanied the report. The same installed LAB20 image was used, with no intervening firmware transfer. The successful result supersedes the pending manual-confirmation status while retaining the earlier failure as historical evidence.
-
-## Installed candidate
-
-| Item | Value |
-| --- | --- |
-| Custom revision | LAB20 |
-| Build ID | `0x544d524b` / TMRK |
-| Actual post-update boot | 2026-10-27 19:44:04 UTC |
-| Vendor-reported firmware | 32 |
-| Controls enabled on boot | Verified true |
-| Radio defaults | Mode 10, RX-clear 2, TX lead 72 µs |
-| Offline suites | 7 |
-| Offline tests passed | 139 |
-| Full-transfer acknowledgements | 7,936 / 7,936 |
-| SoundSend firmware changes | None |
-
-```text
-OTA package SHA-256
-5db5d7f7c48cc4e0cb32b95ef6f4c66a3bb553114316aee63cf4f208a139f34c
-
-Expected installed application SHA-256
-f3a5c1f8caedee8b01fd4386bfefb5d1c74a3acaa872eceac56292b683921253
-
-Application prefix SHA-256
-2483e8d222ae47d896d24084f31bbf770c55f85681fb7a4c5fa40c93ac9dcdcc
-```
-
-The expected installed hash is derived from the acknowledged candidate plus verified custom boot. It is **not** a full physical readback or firmware dump.
 
 ## Physical evidence already obtained
 
@@ -80,7 +87,7 @@ The photographs were copied without image transformations. They show interface c
 
 ## Remaining measurement limits
 
-LAB20 has manual functional acceptance for Fire TV/SoundSend switching and volume control. Separate measured hold/release timing, automatic screen-off timing in each profile, a mute/restore checklist, display latency, and a checklist of every connection-indicator transition remain unmeasured. Long-duration RF reliability, battery consumption, independent power-cycle behavior over repeated cycles, and recovery after a failed update remain uncharacterized. The photographs establish that the volume and battery display was present on the physical LAB19 remote.
+LAB20 has manual functional acceptance for Fire TV/SoundSend switching and volume control. LAB21 is installed; physical confirmation of its 10-second ready interval and profile exit is pending. Separate measured hold/release timing, automatic screen-off timing in each profile, a mute/restore checklist, display latency, and a checklist of every connection-indicator transition remain unmeasured. Long-duration RF reliability, battery consumption, independent power-cycle behavior over repeated cycles, and recovery after a failed update remain uncharacterized. The photographs establish that the volume and battery display was present on the physical LAB19 remote.
 
 ## Evidence included in Git
 

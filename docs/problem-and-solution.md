@@ -24,6 +24,7 @@ The solution adds the Bluetooth central and protocol logic inside the U1. The de
 8. Restore the native inactivity timer after radio use and add paced volume repetition in LAB18 after physical testing exposed persistent screen-on behavior and missing hold support.
 9. Reproduce the remaining physical hold failure with a delayed-response test, then restart the ready window after successful discovery or write confirmation in LAB19.
 10. Reproduce the native HID reconnect race after adding a new Fire TV profile, suspend its retry policy before SoundSend acquisition, and add connection-state feedback in LAB20.
+11. Extend the ready connection to 10 seconds in LAB21 so adjustments can be spaced out while listening, and release the session promptly when selecting another profile or entering pairing.
 
 ## Resulting behavior
 
@@ -35,12 +36,14 @@ The UI does not wait for the entire Bluetooth connection to close before display
 
 Radio ownership preserves the separate native inactivity timer and its pending interrupt. After the bounded connection closes, the original timeout and sleep path remain available, including after changing profiles. See [power management](power-management.md) for the recovered timer path and regression coverage.
 
-LAB20 hands the radio from a native Bluetooth profile to SoundSend by ending the previous HID retry policy before requesting disconnect. A control press connects to the configured transmitter; the connection closes after a short idle interval. The `BT` indicator describes that active session independently of the cached volume. See [Bluetooth profile handoff](bluetooth-profile-handoff.md) for the implementation and indicator meanings.
+LAB20 hands the radio from a native Bluetooth profile to SoundSend by ending the previous HID retry policy before requesting disconnect. A control press connects to the configured transmitter; LAB21 keeps the ready connection available for 10 seconds after the last accepted operation or confirmation, then disconnects. Selecting another profile or entering native pairing releases it sooner. The `BT` indicator describes that active session independently of the cached volume. See [Bluetooth profile handoff](bluetooth-profile-handoff.md) for the implementation and indicator meanings.
 
 ## Evidence boundaries
 
 Manual testing confirmed direct volume control and the LAB16 flicker correction. LAB18's read-only SoundSend query succeeded and its inactivity counter advanced after radio release, but its physical hold test failed. LAB19 passed 134 offline tests, including delayed-response regressions, and its actual boot was verified after installation. Its inactivity counter also advanced, although the first read-only SoundSend query failed to establish a working link.
 
 Subsequent manual feedback accepted LAB19 for SoundSend use. LAB20 passed 139 offline tests, its actual boot was verified, and all five profile records were preserved. Its first hardware check coincided with SoundSend being undiscoverable to the UGREEN adapter and iPhone. After advertisements returned, manual feedback confirmed Fire TV/SoundSend switching and volume control.
+
+LAB21 passed 143 offline tests and was installed with its actual boot and all five unchanged profile records verified. The longer connection interval and prompt profile exit are covered by ARM tests; physical confirmation of that interval is pending.
 
 Original LAB19 photographs show the physical volume/battery screen, native profile menu, and U1 hardware label. These are functional observations, without separate latency, power, or long-duration reliability measurements. The current evidence and limitations are recorded in [validation.md](validation.md). See [connection and changing devices](connection-and-devices.md) for everyday operation and the current fixed-address limitation.

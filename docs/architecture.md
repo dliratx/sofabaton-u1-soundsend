@@ -32,9 +32,11 @@ sequenceDiagram
     U1->>U1: Restore original radio behavior
 ```
 
-The connection interval is 30 ms. The warm interval is bounded to 800 ms, allowing successive presses to reuse service discovery and subscription. LAB19 restarts that interval when discovery or a write is confirmed, as well as when a new key operation is accepted. A slow response therefore cannot cause the newly ready connection to close in the same poll. Confirmed display updates run before disconnect; the connection is not kept open indefinitely.
+The connection interval is 30 ms. LAB21 extends the warm interval from 800 ms to 10 seconds, allowing time to listen between adjustments while reusing service discovery and subscription. The LAB19 behavior that restarts this interval when discovery or a write is confirmed, as well as when a new key operation is accepted, remains in place. A slow response therefore cannot consume the newly ready interval. Confirmed display updates run before disconnect; the connection closes after the bounded idle period.
 
 LAB20 ends the previous native HID retry policy before requesting an asynchronous disconnect. This prevents the native main loop from repeatedly restarting the Fire TV advertiser while SoundSend waits to acquire the radio. The existing HID key path remains available for the next Fire TV operation. See [Bluetooth profile handoff](bluetooth-profile-handoff.md) for the original ARM control flow and regression coverage.
+
+LAB21 releases an active or queued control operation when the selected profile changes or native pairing takes over. The screen hook also releases radio ownership before rendering another native screen. Other native keys retain their existing immediate cancellation path, so the 10-second interval does not delay Fire TV control.
 
 A physical volume-key edge requests one step. A held volume key can repeat after a 400 ms initial ready interval, then at intervals of at least 120 ms after confirmation. Repetition requires an active connection and `SS_READY`, so a slow or unavailable peer cannot accumulate a backlog of timed repeats. Mute remains edge-triggered. Releasing the key stops repeat callbacks; an already transmitted write may still complete.
 
@@ -61,6 +63,6 @@ The native inactivity counter uses LPTIMER1, which is separate from the 16 MHz T
 
 ## Boot defaults and configuration
 
-LAB20 retains the enabled boot default with TX mode 10, RX-clear mode 2, and a 72 µs TX lead. These are the settings previously used for successful physical control. Unknown volume starts as `---`; no guessed percentage is shown. A cached percentage is separate from the active-session indicator.
+LAB21 retains the enabled boot default with TX mode 10, RX-clear mode 2, and a 72 µs TX lead. These are the settings previously used for successful physical control. Unknown volume starts as `---`; no guessed percentage is shown. A cached percentage is separate from the active-session indicator.
 
 Diagnostic commands use a bounded 20-byte FFF4/FFF3 exchange. They do not provide arbitrary memory access. OTA preparation still requires disabled, idle control. Post-update verification checks the actual revision, build identifier, enabled state, and radio defaults before recording a successful installation.

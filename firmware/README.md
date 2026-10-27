@@ -1,6 +1,6 @@
 # Firmware source
 
-The current source is LAB20 / TMRK. Read the root [README](../README.md) for its actual installation status and [architecture](../docs/architecture.md) for module responsibilities.
+The current source is LAB21 / TMRL. Read the root [README](../README.md) for its actual installation status and [architecture](../docs/architecture.md) for module responsibilities.
 
 - `soundsend_client.*`: SoundSend ATT client and confirmed-volume state.
 - `ble_central.*`: single-peer BLE central and connection lifecycle.
