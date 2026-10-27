@@ -1,0 +1,24 @@
+{
+  "elf_sha256": "dd64cebfb6b4b2152149e76efb2af1399b1434f56cccc244a7e887d249dc8342",
+  "source_sha256": "299a7d9e990b13c95badbf07a9712f9d46682a72abcec0b07ef052ad1543e16d",
+  "header_sha256": "2ceda33c5bc3b208526b6d6ecff58834b7ed64ecb3ef4e890c84b8d8a626a03c",
+  "test_harness_sha256": "d1f9c66dbbb2e097857ffb33a813e2277cae9598030a5fb4634879283d1d465a",
+  "tests_run": 16,
+  "passed": true,
+  "target": "ARM Cortex-M0 / thumb-freestanding-eabi",
+  "context_bytes": 50,
+  "public_functions": {
+    "ss_context_size": "0x18001",
+    "ss_status": "0x18005",
+    "ss_volume": "0x18009",
+    "ss_init": "0x18019",
+    "ss_disconnected": "0x18027",
+    "ss_connected": "0x18035",
+    "ss_take_tx": "0x180a5",
+    "ss_key_delta": "0x180cf",
+    "ss_set_volume": "0x18181",
+    "ss_tick": "0x181a9",
+    "ss_receive_att": "0x181dd"
+  },
+  "scope": "New Cortex-M0 protocol component executed offline; no BLE radio driver, key integration, OTA image, or real-device validation"
+}

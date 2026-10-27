@@ -1,0 +1,12 @@
+{"event": "tx", "hex": "00 04 00"}
+{"event": "rx", "hex": "02 04 01 12"}
+{"event": "tx", "hex": "01 04 01 11"}
+{"event": "rx", "hex": "02 04 01 11"}
+{"event": "tx", "hex": "00 04 00"}
+{"event": "rx", "hex": "02 04 01 11"}
+{"event": "rx", "hex": "02 04 01 11"}
+{"event": "tx", "hex": "01 04 01 12"}
+{"event": "rx", "hex": "02 04 01 12"}
+{"event": "rx", "hex": "02 04 01 12"}
+{"event": "tx", "hex": "00 04 00"}
+{"event": "rx", "hex": "02 04 01 12"}

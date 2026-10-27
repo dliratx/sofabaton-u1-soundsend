@@ -1,0 +1,6 @@
+{
+  "tests_run": 8,
+  "passed": true,
+  "package_sha256": "a75b9dd99b6b3b7ac278f1300ee3cbfdf7a235c4b86ae0262e40243d0e8c3da2",
+  "scope": "Host OTA framing, strict acknowledgements and error stopping against original V32 ARM handlers, with modeled GATT. No real adapter or device."
+}

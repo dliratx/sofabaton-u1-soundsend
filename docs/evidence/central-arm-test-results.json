@@ -1,0 +1,8 @@
+{
+  "tests_run": 20,
+  "passed": true,
+  "context_bytes": 352,
+  "elf_sha256": "fb2f0e19051f9f05b09f1b49f8302ad7206157b93134209c286c2aff5a83d534",
+  "source_sha256": "54b87490dbe7e2ebd522036b4191cda05afa7554ee6e27bfa9f809df495dd0d1",
+  "scope": "Central+ATT ARM instructions with protocol peer model; no physical RF/timing validation or installed firmware"
+}

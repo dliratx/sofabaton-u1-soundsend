@@ -1,0 +1,24 @@
+{
+  "revision": 17,
+  "build_id": "0x544d5248",
+  "actual_boot_verified_at": "2026-10-27T05:07:36.886189+00:00",
+  "default_enabled": true,
+  "radio_defaults": {
+    "tx_mode": 10,
+    "rx_clear_mode": 2,
+    "tx_lead_us": 72
+  },
+  "ota_acknowledged_chunks": 7936,
+  "offline_tests_passed": 123,
+  "ota_package_sha256": "a75b9dd99b6b3b7ac278f1300ee3cbfdf7a235c4b86ae0262e40243d0e8c3da2",
+  "expected_application_sha256": "11261280c6e5a4a8ade9ac1943b6f47f43c4fe2c93943ce7680fa75fab39912e",
+  "source_receipt_sha256": "b6b4553bd8464480d9c2ab55a70e5f39cf223134980f2b585d4b68320284a0d6",
+  "physical_feature_confirmation_pending": [
+    "mute and restore button",
+    "battery display",
+    "perceived display latency"
+  ],
+  "scope": "Expected installed bytes plus actual boot/build/default checks; not a physical firmware dump or proof of physical feature behavior.",
+  "configuration_disconnect_acknowledged_at": "2026-10-27T05:08:25.321815+00:00",
+  "dedicated_profile_readback_verified": true
+}
