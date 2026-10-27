@@ -38,6 +38,21 @@
   "source_receipt_sha256": "4b13d7a87dd93d503de33fb60656f587bc1d10a904b8d87bafea977881fb6540",
   "initial_scan_sha256": "f12fb62489f7396317754ebfcbecb701c19ed409498aa92c5291c620fe7f85f4",
   "returned_scan_sha256": "3498bda03a9ea13e61a9c8a3a98de4de1d604ef8306b8168c0801e215cb7922e",
-  "successful_repeated_switching_confirmation_pending": true,
-  "scope": "The first manual attempt failed with a scan timeout and no transmitted packets. Neither the UGREEN scan nor the iPhone found SoundSend. Its advertisement reappeared after a transmitter restart was announced. This establishes an availability problem during that attempt, but does not identify why advertising stopped or yet validate repeated profile handoff."
+  "successful_repeated_switching_confirmation_pending": false,
+  "scope": "The initial scan timeout and discovery failure are retained as historical evidence. SoundSend advertisements returned after an announced transmitter restart. Subsequent manual feedback confirmed Fire TV/SoundSend switching and volume control with the same installed LAB20 image; no instrumented reliability or timing measurements accompanied that report.",
+  "updated_at": "2026-10-27T20:03:20.058544+00:00",
+  "subsequent_manual_acceptance": {
+    "recorded_at": "2026-10-27T20:03:20.058544+00:00",
+    "reported_result": "passed",
+    "feedback_summary_en": "The setup now works as intended.",
+    "confirmed_functions": [
+      "Fire TV and SoundSend profile switching",
+      "SoundSend volume control after switching"
+    ],
+    "requested_check": "Alternate SoundSend -> Fire TV -> SoundSend three times and verify volume control after returning.",
+    "independent_cycle_count_recorded": false,
+    "instrumented_timing_trace_recorded": false,
+    "additional_firmware_transfer_between_initial_failure_and_acceptance": false,
+    "scope": "Manual functional confirmation in response to the repeated-switching check. No separate latency, power, long-duration reliability, or complete indicator-transition measurements were supplied."
+  }
 }

@@ -43,18 +43,18 @@ Click a photo to open the original image. These LAB19 photographs predate the li
 
 ## Current status
 
-**LAB20 / TMRK is installed; its actual boot was verified on 2026-10-27 at 19:44:04 UTC.** All 7,936 transfer blocks were acknowledged. The exact package passed **139 offline tests** and installer preflight. All five profile records were read back unchanged, including the new Fire TV profile. Physical switching confirmation is pending.
+**LAB20 / TMRK is installed, with Fire TV/SoundSend switching and volume control confirmed through manual testing.** Its actual boot was verified on 2026-10-27 at 19:44:04 UTC after all 7,936 transfer blocks were acknowledged. The exact package passed **139 offline tests** and installer preflight. All five profile records were read back unchanged, including the new Fire TV profile.
 
-Earlier manual feedback accepted LAB19 for SoundSend use. After adding a new Fire TV profile through the app, a separate failure was reported: Fire TV worked, but returning to SoundSend left a cached percentage without working volume commands. A fresh read confirmed all five profiles, including the new Fire TV profile at slot 5. LAB20's correction is installed and validated offline; repeated physical transitions remain to be tested.
+LAB20 corrects a native HID reconnection race that could prevent SoundSend from acquiring the radio after Fire TV use. A first hardware check also found SoundSend unavailable to both the PC scanner and the iPhone. Its advertisements returned after a transmitter restart, and subsequent manual feedback confirmed that profile switching and volume control work as intended. The original failure and later acceptance are recorded separately in the [validation record](docs/validation.md).
 
-LAB19's actual boot was verified on 2026-10-27 at 16:42:40 UTC after 7,936 acknowledged transfer blocks. Hardware snapshots confirmed that the inactivity counter continued advancing after radio release. Controls enable automatically on a full boot. The vendor application reports version 32 for this V32-based extension; custom diagnostics distinguish LAB revisions. Historical diagnostics and manual feedback remain in the validation record.
+Hardware snapshots from earlier revisions confirmed that the inactivity counter continued advancing after radio release. Controls enable automatically on a full boot. The vendor application reports version 32 for this V32-based extension; custom diagnostics identify LAB20. Manual acceptance does not provide instrumented latency, current-consumption, or long-duration reliability measurements.
 
 | Capability | Evidence |
 | --- | --- |
 | Direct U1 → SoundSend volume changes | Confirmed through manual testing on earlier installed revisions |
 | One volume step per physical press | Implemented and ARM-tested; up/down operation confirmed through manual testing |
 | Dedicated SoundSend profile | Read back from the remote; other profiles preserved |
-| Fire TV and SoundSend switching | LAB19 failure reported; LAB20 correction installed and ARM-tested; physical switching confirmation pending |
+| Fire TV and SoundSend switching | LAB20 correction installed and ARM-tested; subsequent manual switching and volume-control acceptance confirmed |
 | Stable volume screen without profile-menu flash | LAB16 correction confirmed through manual testing |
 | Native inactivity timer after Bluetooth use | Verified advancing on hardware; native sleep path covered offline |
 | Gradual volume repetition while held | LAB19 delayed-response correction tested offline; subsequent overall manual acceptance recorded |
@@ -69,7 +69,7 @@ See [validation and installation evidence](docs/validation.md) for exact hashes,
 
 Turn on the projector so that SoundSend has power, select **SoundSend** on the U1, and use the volume or mute buttons. No pairing step, phone, or PC is required for normal use. Disconnect any active U1 configuration session first.
 
-The installed firmware targets SoundSend address `CC:90:93:18:93:0A`. A button press starts a direct connection; the link closes after a short idle interval and the next press connects again. The target survives battery replacement because it is compiled into the firmware. There is currently no menu for choosing a different SoundSend: changing transmitters requires verifying the replacement device and rebuilding and installing the U1 extension with its address.
+The installed firmware targets SoundSend address `CC:90:93:18:93:0A`. A button press starts a direct connection; the link closes about 800 ms after the last accepted operation or confirmation, and the next press connects again. Seeing `BT` appear during volume control and disappear afterward is normal. This is a temporary connection to the known transmitter, not a new pairing procedure. The target survives battery replacement because it is compiled into the firmware. There is currently no menu for choosing a different SoundSend: changing transmitters requires verifying the replacement device and rebuilding and installing the U1 extension with its address.
 
 See [connection, reconnection, and changing devices](docs/connection-and-devices.md) for the complete procedure, including the difference between configuration pairing and normal control.
 
@@ -77,7 +77,7 @@ See [connection, reconnection, and changing devices](docs/connection-and-devices
 
 Select the **SoundSend** profile on the U1 and keep the transmitter powered.
 
-The button behavior below is retained in LAB20. Its new native Bluetooth handoff and link indicator still require physical switching confirmation.
+The button behavior below is retained in LAB20. Subsequent manual feedback confirms profile switching and volume control; detailed timing and a separate checklist for every indicator transition were not recorded.
 
 | Button | Action |
 | --- | --- |

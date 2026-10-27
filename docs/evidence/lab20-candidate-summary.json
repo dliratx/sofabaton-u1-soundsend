@@ -10,10 +10,12 @@
   "installer_preflight_passed": true,
   "installed": true,
   "current_installed_revision": 20,
-  "physical_switching_confirmation_pending": true,
+  "physical_switching_confirmation_pending": false,
   "validated_at": "2026-10-27T19:35:35.550193+00:00",
   "regression": "The original native post-poll HID retry branch restarted the previous advertiser 27 times in 32 modeled poll iterations. LAB20 ends that retry policy before asynchronous handoff.",
-  "scope": "Offline validation of the exact installed package. Actual boot and profile preservation are recorded separately; physical switching confirmation remains pending.",
+  "scope": "Offline validation of the exact installed package. Actual boot, profile preservation, and subsequent successful manual switching acceptance are recorded separately; long-duration reliability and instrumented timing remain unmeasured.",
   "actual_boot_verified_at": "2026-10-27T19:44:04.421577+00:00",
-  "installation_evidence": "lab20-installation-summary.json"
+  "installation_evidence": "lab20-installation-summary.json",
+  "subsequent_manual_switching_acceptance_reported": true,
+  "manual_evidence": "lab20-manual-feedback.json"
 }

@@ -8,9 +8,11 @@ The exact candidate has package SHA-256 `5db5d7f7c48cc4e0cb32b95ef6f4c66a3bb5531
 
 Before installation, a live read at 2026-10-27 19:13 UTC confirmed LAB19 and five profiles: Proyector (1), SoundSend (2), Android TV (3), HDMI (4), and the newly added Fire TV (5). No old Fire TV backup was restored. The cached volume was 55, with the last central attempt failed at reason `0x08`. This diagnostic does not prove that the reproduced native reconnect race was the only physical failure cause.
 
-The regression executes the original native post-poll HID restart branch with modeled asynchronous disconnect and RF behavior. LAB19 restarted the previous advertiser 27 times in 32 modeled poll iterations; LAB20 acquires the radio and completes the modeled SoundSend operation. Additional cases cover the return to the native HID key path, pairing exclusion, and honest link indicators. Successful repeated physical Fire TV-to-SoundSend switching remains unconfirmed for LAB20. See [handoff details](bluetooth-profile-handoff.md) and [candidate evidence](evidence/lab20-candidate-summary.json).
+The regression executes the original native post-poll HID restart branch with modeled asynchronous disconnect and RF behavior. LAB19 restarted the previous advertiser 27 times in 32 modeled poll iterations; LAB20 acquires the radio and completes the modeled SoundSend operation. Additional cases cover the return to the native HID key path, pairing exclusion, and honest link indicators. Subsequent manual feedback confirms Fire TV/SoundSend switching and volume control. See [handoff details](bluetooth-profile-handoff.md) and [candidate evidence](evidence/lab20-candidate-summary.json).
 
-The first LAB20 manual attempt displayed `!` and did not control SoundSend. Diagnostics showed scan timeout `0x08`, zero transmitted packets, and no confirmed volume. A 15-second UGREEN scan found 16 nearby devices but not the exact SoundSend address; the iPhone also could not find the powered transmitter. SoundSend advertisements reappeared after a transmitter restart was announced. The scan was passive and did not connect the PC to SoundSend. This identifies unavailability during that attempt, without establishing why advertising stopped. A repeated switching test with the transmitter available is pending. See [manual feedback and discovery evidence](evidence/lab20-manual-feedback.json).
+The first LAB20 manual attempt displayed `!` and did not control SoundSend. Diagnostics showed scan timeout `0x08`, zero transmitted packets, and no confirmed volume. A 15-second UGREEN scan found 16 nearby devices but not the exact SoundSend address; the iPhone also could not find the powered transmitter. SoundSend advertisements reappeared after a transmitter restart was announced. The scan was passive and did not connect the PC to SoundSend. This identifies unavailability during that attempt, without establishing why advertising stopped. See [manual feedback and discovery evidence](evidence/lab20-manual-feedback.json).
+
+On 2026-10-27, subsequent manual feedback confirmed that the setup works as intended in response to a requested three-cycle SoundSend → Fire TV → SoundSend check with volume control after returning. This records functional acceptance of switching and volume control; no independent cycle count or instrumented timing trace accompanied the report. The same installed LAB20 image was used, with no intervening firmware transfer. The successful result supersedes the pending manual-confirmation status while retaining the earlier failure as historical evidence.
 
 ## Installed candidate
 
@@ -62,7 +64,7 @@ That first SoundSend query did not establish a working link: its terminal centra
 
 See [LAB19 installation evidence](evidence/lab19-installation-summary.json), [candidate evidence](evidence/lab19-candidate-summary.json), and the historical [LAB18 installation evidence](evidence/lab18-installation-summary.json).
 
-## Subsequent manual acceptance and photographs
+## LAB19 manual acceptance and photographs
 
 On 2026-10-27, subsequent feedback reported that the remote now works as intended. This is overall manual functional acceptance of the installed setup and supersedes the earlier status awaiting feedback after diagnostics. The report was not a separate checklist for every feature, and no new instrumented session or firmware transfer accompanied it.
 
@@ -78,7 +80,7 @@ The photographs were copied without image transformations. They show interface c
 
 ## Remaining measurement limits
 
-LAB19's earlier SoundSend-only use received manual functional acceptance; the subsequent Fire TV-to-SoundSend failure is recorded above. LAB20 is installed and still requires physical switching validation. Separate measured hold/release timing, automatic screen-off timing in each profile, a mute/restore checklist, and display latency were not supplied with the earlier report. Long-duration RF reliability, battery consumption, independent power-cycle behavior over repeated cycles, and recovery after a failed update remain uncharacterized. The photographs establish that the volume and battery display was present on the physical LAB19 remote.
+LAB20 has manual functional acceptance for Fire TV/SoundSend switching and volume control. Separate measured hold/release timing, automatic screen-off timing in each profile, a mute/restore checklist, display latency, and a checklist of every connection-indicator transition remain unmeasured. Long-duration RF reliability, battery consumption, independent power-cycle behavior over repeated cycles, and recovery after a failed update remain uncharacterized. The photographs establish that the volume and battery display was present on the physical LAB19 remote.
 
 ## Evidence included in Git
 

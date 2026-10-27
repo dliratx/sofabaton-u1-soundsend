@@ -6,7 +6,9 @@
 - Preserve native profile records and the HID key path; yield custom keys during app and device-pairing screens.
 - Add connecting, active-session, and failure indicators separate from the cached volume percentage, within the existing display timing budget and 424-byte retained state.
 - Accept additional native device profiles in the physical-key activation helper while retaining the exact SoundSend profile guard.
-- Passed 139 offline tests and exact-package installer preflight. Installed with 7,936 acknowledged blocks; actual LAB20 boot, enabled defaults, and all five unchanged profile records verified. Physical switching confirmation is pending.
+- Passed 139 offline tests and exact-package installer preflight. Installed with 7,936 acknowledged blocks; actual LAB20 boot, enabled defaults, and all five unchanged profile records verified.
+- Confirmed Fire TV/SoundSend switching and volume control through subsequent manual feedback after SoundSend advertisements returned. Retained the earlier scan-timeout evidence separately.
+- Explained the expected temporary Bluetooth connection: a control press connects to the known transmitter, and `BT` clears after the idle connection closes.
 - Document app-based creation of a new Fire TV profile and distinguish it from U1 configuration pairing.
 
 ## Documentation — Hardware photos and connection guide

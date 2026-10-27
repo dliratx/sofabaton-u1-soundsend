@@ -50,7 +50,8 @@
   "physical_keys_enabled_after_verification": true,
   "soundSend_firmware_modified": false,
   "pc_soundSend_volume_write": false,
-  "physical_switching_confirmation_pending": true,
-  "scope": "Acknowledged full application transfer, actual boot/build/default checks, and unchanged native profile metadata. Expected firmware hashes are not a full physical readback. Subsequent manual failure and transmitter discovery results are recorded separately; successful repeated switching confirmation remains pending.",
-  "subsequent_manual_evidence": "lab20-manual-feedback.json"
+  "physical_switching_confirmation_pending": false,
+  "scope": "Acknowledged full application transfer, actual boot/build/default checks, and unchanged native profile metadata. Expected firmware hashes are not a full physical readback. The subsequent manual failure, transmitter discovery results, and successful switching acceptance are recorded separately.",
+  "subsequent_manual_evidence": "lab20-manual-feedback.json",
+  "subsequent_manual_switching_acceptance_reported": true
 }

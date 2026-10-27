@@ -13,6 +13,8 @@ The U1 scans for the configured transmitter when a control action needs a connec
 
 There is no need to keep the Bluetooth link permanently open. The next control press starts a new connection when necessary. The OLED shows the last confirmed volume; while disconnected, it is not a continuously refreshed monitor of changes made by another controller.
 
+It is normal for the remote to connect when volume is pressed. `...` means the connection is being established; `BT` means the active session has received a valid volume. `BT` disappears when the idle connection closes, and the next press reconnects to the same address. This does not repeat device setup or pairing. A connection left idle is released so the native firmware can use the radio for other profiles.
+
 ## What was configured
 
 | Setting | Installed value | Where it is stored |
@@ -43,7 +45,7 @@ For Fire TV, the target-side path is **Settings → Controllers & Bluetooth Devi
 
 Adding a new profile does not require restoring an old profile backup. The recorded new Fire TV profile uses internal ID 5, alongside SoundSend at ID 2. Keep the dedicated SoundSend profile in place.
 
-LAB19 exposed a failure when returning from an active Fire TV connection to SoundSend. LAB20 addresses the native reconnect race and adds a link indicator; see [Bluetooth profile handoff](bluetooth-profile-handoff.md) and [validation status](validation.md). The U1 hands over its radio between these control paths rather than maintaining both links simultaneously.
+LAB19 exposed a failure when returning from an active Fire TV connection to SoundSend. LAB20 addresses the native reconnect race and adds a link indicator. Subsequent manual testing confirmed switching and volume control; see [Bluetooth profile handoff](bluetooth-profile-handoff.md) and [validation status](validation.md). The U1 hands over its radio between these control paths rather than maintaining both links simultaneously.
 
 ## Power loss and reconnection
 
@@ -57,6 +59,8 @@ LAB19 exposed a failure when returning from an active Fire TV connection to Soun
 | A diagnostic temporarily disabled the custom controls | A full U1 restart restores the enabled startup default. Recreating the profile is unnecessary. |
 
 The initial scan is bounded to three seconds; later connection and protocol stages have their own timeouts. A failed attempt does not erase or select a different target. Selecting the profile alone does not start a continuous connection.
+
+If `!` appears and the SoundSend app also cannot discover the powered transmitter, close active app/diagnostic connections and check its power and range. In the recorded LAB20 session, SoundSend advertisements returned after restarting the transmitter; subsequent manual control and profile switching worked. Recreating the U1 profile or repeating pairing was unnecessary. The reason SoundSend stopped advertising was not established.
 
 ## Using the same U1 with another SoundSend
 
