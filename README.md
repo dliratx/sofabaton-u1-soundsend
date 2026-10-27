@@ -13,13 +13,13 @@ The SoundSend volume was controllable through its iPhone app, but the projector'
 The U1 firmware was extended with a small BLE central, a SoundSend ATT client, and hooks into the remote's key and display routines. A dedicated **SoundSend** profile replaces the former Fire TV profile. The extension reads the actual volume, sends a bounded change, and shows the value confirmed by the transmitter.
 
 ```mermaid
-flowchart LR
-    K[U1 physical buttons] --> P[Dedicated SoundSend profile]
-    P --> C[BLE central and ATT client inside U1]
-    C <-->|Direct Bluetooth control| S[SoundSend]
-    S --> A[Existing speaker system]
-    C --> O[U1 OLED: volume, battery, mute]
-    D[Windows PC and UGREEN adapter] -. Development and OTA only .-> P
+flowchart TD
+    K[U1 buttons] --> P[SoundSend profile]
+    P --> C[U1 BLE central and ATT client]
+    C <-->|Direct Bluetooth| S[SoundSend]
+    S --> A[Speakers]
+    C --> O[OLED: volume, battery, mute]
+    D[PC and UGREEN] -. Development and OTA only .-> P
 ```
 
 Only the **U1 firmware** is modified. SoundSend retains its original firmware. Bluetooth carries control messages here, not the audio stream.
