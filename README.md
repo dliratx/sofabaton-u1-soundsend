@@ -14,11 +14,11 @@ The U1 firmware was extended with a small BLE central, a SoundSend ATT client, a
 
 ```mermaid
 flowchart TD
-    K[U1 buttons] --> P[SoundSend profile]
-    P --> C[U1 BLE central and ATT client]
+    K[U1 buttons] --> P["SoundSend<br/>profile"]
+    P --> C["BLE central<br/>ATT client"]
     C <-->|Direct Bluetooth| S[SoundSend]
     S --> A[Speakers]
-    C --> O[OLED: volume, battery, mute]
+    C --> O["OLED<br/>Volume, mute<br/>Battery"]
     D[PC and UGREEN] -. Development and OTA only .-> P
 ```
 
