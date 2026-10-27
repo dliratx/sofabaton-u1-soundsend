@@ -54,4 +54,6 @@ The dedicated profile has device ID 2 and the native name `SoundSend`. Its empty
 
 The custom diagnostic request begins `53 53 01`, includes an operation byte, and ends with an 8-bit checksum. Responses identify the custom revision and, through a separate query, the build. The normal vendor app firmware number remains 32 because this is a V32-based extension.
 
+LAB18 command 14 provides a read-only power snapshot. Response bytes 4–7 hold native inactivity ticks, 8–11 hold the timeout threshold, and 12–15 hold LPTIMER1 control, all little-endian. Bytes 16 and 17 hold the native screen mode and BLE state. Revision and checksum remain at bytes 18 and 19. This command accepts no address and performs no writes.
+
 The original OTA transfer uses 16-byte application chunks with individually checked address acknowledgements. A complete acknowledged transfer is not sufficient evidence of activation: the actual post-reset build must be read back.

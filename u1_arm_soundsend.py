@@ -1,4 +1,4 @@
-"""Arm one-step physical U1 volume keys after exact build/profile readback.
+"""Arm physical U1 volume keys after exact build/profile readback.
 
 Only volatile debug configuration and the vendor disconnect command6.
 No firmware data, OTA preparation, SoundSend connection, or PC volume writes.
@@ -19,9 +19,9 @@ from firmware.build_delta_lab import STATE
 async def run(args):
     expected = json.loads(STATE.read_text())
     revision=expected.get('lab_protocol_revision');build=expected.get('lab_build_id')
-    if ({15:'0x544d5246',16:'0x544d5247',17:'0x544d5248'}.get(revision)!=build or
+    if ({15:'0x544d5246',16:'0x544d5247',17:'0x544d5248',18:'0x544d5249',19:'0x544d524a'}.get(revision)!=build or
         not expected.get('boot_and_control_plane_verified')):
-        raise RuntimeError('Only a verified physical LAB15/TMRF, LAB16/TMRG or LAB17/TMRH may be armed by this script')
+        raise RuntimeError('Only a verified physical LAB15 through LAB19 build may be armed by this script')
     with args.output.open('x', encoding='utf8') as log:
         def record(event, **fields):
             row = dict(time=datetime.now(timezone.utc).isoformat(), event=event, **fields)
@@ -32,7 +32,7 @@ async def run(args):
                 record('identity', **await read_identity(client))
                 state = await exchange(client, 1)
                 record('before', **state)
-                if state['lab_protocol_revision'] != revision or (state['enabled'] and revision!=17) or state['phase'] != 'idle':
+                if state['lab_protocol_revision'] != revision or (state['enabled'] and revision not in (17,18,19)) or state['phase'] != 'idle':
                     raise RuntimeError(f'Expected disabled/idle LAB{revision}')
                 clock = await exchange(client, 5)
                 record('build', **clock)
@@ -48,7 +48,7 @@ async def run(args):
                 keys = await app.query(12, bytes([2, 255]))
                 if keys != [bytes.fromhex('a5 5a 01 03 07 0a')]:
                     raise RuntimeError('Dedicated empty profile key state is ambiguous or has leftover keys')
-                record('dedicated_profile_has_no_old_fire_tv_keys', replies=[p.hex(' ') for p in keys])
+                record('dedicated_profile_has_empty_native_keys', replies=[p.hex(' ') for p in keys])
                 await client.stop_notify(APP_NOTIFY)
                 mode = await exchange(client, 4, 10)
                 rx = await exchange(client, 8, 2)
@@ -68,7 +68,7 @@ async def run(args):
                 except Exception as error:
                     record('configuration_disconnect_ack_missing', error=f'{type(error).__name__}: {error}')
                 await asyncio.sleep(1)
-                record('armed_for_physical_test', firmware_revision=revision, daily_boot_default_enabled=revision==17,
+                record('armed_for_physical_test', firmware_revision=revision, daily_boot_default_enabled=revision in (17,18,19),
                        expected_step=1, radio_mode=10, tx_lead_us=72, confirmed_baseline_volume=state['volume'],
                        pc_soundSend_connection=False, pc_volume_write=False, firmware_data_written=False)
         except BaseException as error:

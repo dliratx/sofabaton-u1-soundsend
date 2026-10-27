@@ -1,5 +1,26 @@
 # Change log
 
+## LAB19 — Preserve the repeat window after a slow response
+
+- Start the ready interval when discovery or a volume write is confirmed, so a slow operation cannot consume the entire idle window.
+- Added regression coverage for delayed discovery, delayed volume confirmation, and a subsequent press after a slow operation.
+- Passed 134 offline tests across seven suites; the exact OTA candidate passed installer preflight validation.
+- This addresses a timing defect that reproduces LAB18's failed physical hold test; LAB19 physical validation remains pending.
+- Installation is pending access to the U1 in Pairing mode; LAB18 remains installed.
+
+## LAB18 — Native sleep restoration and bounded volume repetition
+
+- Fixed the inactivity timer left stopped after radio acquisition in LAB17.
+- Preserved a pending native inactivity interrupt when releasing the radio.
+- Kept the original sleep path reachable after volume use and profile changes.
+- Added volume hold repetition after 400 ms, then every 120 ms with confirmation gating.
+- Kept mute edge-triggered and stopped timed repeats when the key is released.
+- Extended the bounded warm connection interval from 500 to 800 ms for successive presses.
+- Added a read-only power snapshot and native ARM regression coverage.
+- Passed 132 offline tests; actual installation and enabled boot verified.
+- Read SoundSend's volume on hardware and verified inactivity ticks advancing after radio release.
+- The inactivity timer was verified on hardware, but the physical held-volume test still produced only one change. LAB19 adds delayed-response coverage and a timing correction.
+
 ## LAB17 — Mute, battery, display latency, and boot defaults
 
 - Added physical button 13 mute/restore using confirmed SoundSend volume.

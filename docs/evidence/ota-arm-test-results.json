@@ -1,6 +1,6 @@
 {
   "tests_run": 6,
   "passed": true,
-  "package_sha256": "a75b9dd99b6b3b7ac278f1300ee3cbfdf7a235c4b86ae0262e40243d0e8c3da2",
+  "package_sha256": "79c0704cab48668e03aceebdab096c1863297e8c3d6ba37822471b259f41473c",
   "scope": "Original V32 OTA command/data handlers + boot descriptor checks/copy loop. Flash drivers modeled, clock wait skipped. No actual FW33/BLE transport, power-loss or recovery validation."
 }

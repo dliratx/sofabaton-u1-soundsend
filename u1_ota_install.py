@@ -27,7 +27,8 @@ def validated_package(expected=None):
     raw=(ROOT/'firmware/u1-v32-lab-offline.bin').read_bytes()
     if hashlib.sha256(raw).hexdigest()!=manifest['raw_image_sha256'] or raw[:APPLICATION_END]!=application:
         raise ValueError('Package, image, and manifest are inconsistent')
-    daily=(manifest.get('lab_protocol_revision')==17 and manifest.get('lab_build_id')=='0x544d5248' and
+    daily=({17:'0x544d5248',18:'0x544d5249',19:'0x544d524a'}.get(manifest.get('lab_protocol_revision'))==manifest.get('lab_build_id') and
+           manifest.get('lab_protocol_revision') in (17,18,19) and
            manifest.get('boot_radio_configuration')=={'tx_mode':10,'rx_clear_mode':2,'tx_lead_us':72})
     if (not manifest['lab_disabled_on_reset'] and not daily) or manifest['soundSend_firmware_modified']:
         raise ValueError('Unexpected boot configuration or SoundSend firmware change')
@@ -153,7 +154,7 @@ async def execute(args,application,plan):
                 if state['enabled']!=daily or state['phase']!='idle':raise RuntimeError('Unexpected firmware boot state')
                 if daily:
                     clock=await exchange(client,5);radio=await exchange(client,7)
-                    if state['lab_protocol_revision']!=17 or clock['build_id']!='0x544d5248' or state['tx_mode']!=10 or radio['rx_clear_mode']!=2 or radio['tx_lead_us']!=72:
+                    if state['lab_protocol_revision']!=plan['lab_protocol_revision'] or clock['build_id']!=plan['lab_build_id'] or state['tx_mode']!=10 or radio['rx_clear_mode']!=2 or radio['tx_lead_us']!=72:
                         raise RuntimeError('Unexpected daily build or radio defaults')
                 record('custom_lab_boot_verified',identity=identity,state=state,
                        physical_soundsend_control_verified=False)

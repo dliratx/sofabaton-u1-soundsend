@@ -1,0 +1,15 @@
+{
+  "package_sha256": "79c0704cab48668e03aceebdab096c1863297e8c3d6ba37822471b259f41473c",
+  "expected_result_sha256": "054665cc6b2ef3f03087d7a7580fcde5c363434257696f23666aeee11350969f",
+  "target_prefix_sha256": "ef9d46286de46e3af2cff8fb50a63d6b7aecc6a69435c8e3d5da0b744edca405",
+  "result_lab_revision": 19,
+  "result_lab_build_id": "0x544d524a",
+  "result_default_enabled": true,
+  "offline_tests_passed": 134,
+  "offline_suites": 7,
+  "installed": false,
+  "current_installed_revision": 18,
+  "physical_validation_pending": true,
+  "regression": "LAB18 made one volume write when service discovery was delayed by 900 ms. LAB19 preserves the ready interval after discovery and write confirmation.",
+  "scope": "Offline candidate validation; no LAB19 installation or physical behavior claim."
+}

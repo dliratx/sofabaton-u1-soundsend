@@ -1,0 +1,75 @@
+{
+  "revision": 18,
+  "build_id": "0x544d5249",
+  "actual_boot_verified_at": "2026-10-27T16:08:45.728480+00:00",
+  "default_enabled": true,
+  "radio_defaults": {
+    "tx_mode": 10,
+    "rx_clear_mode": 2,
+    "tx_lead_us": 72
+  },
+  "ota_acknowledged_chunks": 7936,
+  "offline_tests_passed": 132,
+  "ota_package_sha256": "0ca09ee46c91f4edacf722994892416dee0e8075ea6a7bc2195eeb25dac553da",
+  "expected_application_sha256": "1413a56ac4a5904cefd473ff9691f843ca87d65d2c14c80045c8dd6b620d04eb",
+  "application_prefix_sha256": "0753b66651301a792ce96eeb87f718f765cff9f117f6e4259d602063a060fbcf",
+  "source_receipt_sha256": "6cd07d7da9ffeb5bed0de755d33d4f499c15684414f7e4402cdc9c45ad121209",
+  "configuration_disconnect_acknowledged_at": "2026-10-27T16:10:11.307524+00:00",
+  "dedicated_profile_readback_verified": true,
+  "read_only_soundsend_probe": {
+    "confirmed_volume": 45,
+    "tx_packets": 30,
+    "rx_packets": 30,
+    "crc_errors": 1,
+    "errors": 2,
+    "terminal_reason": 0,
+    "audio_write_requested": false
+  },
+  "power_snapshots_after_radio": [
+    {
+      "time": "2026-10-27T16:09:41.601172+00:00",
+      "sample": 0,
+      "idle_ticks": 20,
+      "idle_timeout_ticks": 3600,
+      "inactivity_timer_control": "0xc7",
+      "inactivity_timer_running": true,
+      "screen_mode": 3,
+      "native_ble_state": 3,
+      "lab_protocol_revision": 18
+    },
+    {
+      "time": "2026-10-27T16:09:42.308640+00:00",
+      "sample": 1,
+      "idle_ticks": 21,
+      "idle_timeout_ticks": 3600,
+      "inactivity_timer_control": "0xc7",
+      "inactivity_timer_running": true,
+      "screen_mode": 3,
+      "native_ble_state": 3,
+      "lab_protocol_revision": 18
+    },
+    {
+      "time": "2026-10-27T16:09:43.028902+00:00",
+      "sample": 2,
+      "idle_ticks": 23,
+      "idle_timeout_ticks": 3600,
+      "inactivity_timer_control": "0xc7",
+      "inactivity_timer_running": true,
+      "screen_mode": 3,
+      "native_ble_state": 3,
+      "lab_protocol_revision": 18
+    }
+  ],
+  "inactivity_ticks_advanced": true,
+  "physical_feature_confirmation_pending": [
+    "automatic screen-off in SoundSend and after leaving the profile",
+    "held volume repeat and stop on release",
+    "perceived volume/display latency",
+    "mute and restore button",
+    "battery display"
+  ],
+  "scope": "Expected installed bytes plus actual boot/build/default checks, a read-only radio query, and hardware inactivity counter snapshots; not a physical firmware dump, electrical sleep-current measurement, or proof of physical button/display behavior.",
+  "physical_held_volume_repeat_confirmed": false,
+  "physical_held_volume_repeat_result": "Manual test failed: holding volume did not produce gradual changes; multiple separate presses were required.",
+  "manual_feedback_at": "2026-10-27T16:15:19.525059+00:00"
+}

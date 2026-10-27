@@ -45,16 +45,16 @@ The full build produces three ARM ELF files, an assembled image, an OTA package,
 
 ## Test suites
 
-| Suite | LAB17 tests | Coverage |
+| Suite | LAB19 tests | Coverage |
 | --- | ---: | --- |
 | `test_client_arm.py` | 16 | ATT discovery, notifications, bounds, deferred changes, mute writes |
 | `test_central_arm.py` | 20 | BLE central, packet order, fragmentation, connection lifecycle |
 | `test_ble_packet_arm.py` | 8 | CRC, whitening, and packet vectors |
-| `test_u1_lab_arm.py` | 63 | Patched hooks, native key dispatch, MMIO model, OLED, battery, mute, boot defaults |
+| `test_u1_lab_arm.py` | 74 | Patched hooks, native key dispatch, timer handoff, sleep entry, held-key repetition with delayed responses, OLED, battery, mute, boot defaults |
 | `test_lcd_retention_arm.py` | 2 | Lower-SRAM state and mute restoration after modeled upper-bank loss |
 | `test_ota_lab_arm.py` | 6 | Original OTA handlers, boot copy, descriptor and protected regions |
 | `test_ota_transport.py` | 8 | Host framing, strict acknowledgements, stop behavior, postboot identity |
-| **Total** | **123** | **All passed for the installed candidate** |
+| **Total** | **134** | **All passed for this candidate; physical installation pending** |
 
 The standalone `test_delta_lab_arm.py` is historical research and is not part of this full-application build. It requires local installed-state and delta artifacts that are not included in a clone.
 

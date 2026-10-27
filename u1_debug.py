@@ -10,18 +10,24 @@ from u1_transport import open_remote,read_identity,APP_SERVICE
 
 READ='0000fff3-0000-1000-8000-00805f9b34fb'
 WRITE='0000fff4-0000-1000-8000-00805f9b34fb'
-COMMANDS={'status':1,'probe':2,'enable':3,'disable':3,'tx-mode':4,'clock':5,'radio':6,'tx-snapshot':7,'rx-clear-mode':8,'radio-config':9,'modem-config':10,'tx-lead':11,'delay-config':13}
+COMMANDS={'status':1,'probe':2,'enable':3,'disable':3,'tx-mode':4,'clock':5,'radio':6,'tx-snapshot':7,'rx-clear-mode':8,'radio-config':9,'modem-config':10,'tx-lead':11,'delay-config':13,'power':14}
 
 
 def request_packet(command,argument=0):
-    if command not in range(1,14) or not 0<=argument<=255:raise ValueError('Invalid debug command/argument')
+    if command not in range(1,15) or not 0<=argument<=255:raise ValueError('Invalid debug command/argument')
     p=bytearray(20);p[:5]=bytes([0x53,0x53,1,command,argument]);p[19]=sum(p[:19])&255;return bytes(p)
 
 
 def decode_response(packet,command):
     p=bytes(packet)
-    if len(p)!=20 or p[:4]!=bytes([0x53,0x53,1,command|0x80]) or sum(p[:19])&255!=p[19] or p[18] not in range(1,18):
+    if len(p)!=20 or p[:4]!=bytes([0x53,0x53,1,command|0x80]) or sum(p[:19])&255!=p[19] or p[18] not in range(1,20):
         raise ValueError('Response is not from the custom firmware or has an invalid checksum')
+    if command==14:
+        if p[18]<18:raise ValueError('Power diagnostics require LAB18')
+        control=int.from_bytes(p[12:16],'little')
+        return {'idle_ticks':int.from_bytes(p[4:8],'little'),'idle_timeout_ticks':int.from_bytes(p[8:12],'little'),
+                'inactivity_timer_control':hex(control),'inactivity_timer_running':bool(control&1),
+                'screen_mode':p[16],'native_ble_state':p[17],'lab_protocol_revision':p[18]}
     if command==5:
         if p[18]<2:raise ValueError('Clock snapshot requires LAB revision2 or later')
         before=int.from_bytes(p[8:12],'little');after=int.from_bytes(p[12:16],'little')
@@ -118,6 +124,7 @@ async def run(args):
             # Always prove that this is the custom lab before a probe/enable.
             state=await exchange(client,1,trace=record);record('status',**state)
             if args.command!='status':
+                if args.command=='power' and state['lab_protocol_revision']<18:raise RuntimeError('Power diagnostics require LAB18')
                 if args.command=='clock' and state['lab_protocol_revision']<2:raise RuntimeError('Installed LAB has no clock snapshot command')
                 if args.command=='radio' and state['lab_protocol_revision']<3:raise RuntimeError('Installed LAB has no radio snapshot command')
                 if args.command=='tx-snapshot' and state['lab_protocol_revision']<5:raise RuntimeError('Installed LAB has no TX snapshot command')

@@ -32,7 +32,9 @@ sequenceDiagram
     U1->>U1: Restore original radio behavior
 ```
 
-The connection interval is 30 ms. A 500 ms inactivity hold allows consecutive presses to reuse a live connection. LAB16 delayed its display until this hold and termination completed; LAB17 retains connection reuse while displaying confirmed updates earlier.
+The connection interval is 30 ms. The warm interval is bounded to 800 ms, allowing successive presses to reuse service discovery and subscription. LAB19 restarts that interval when discovery or a write is confirmed, as well as when a new key operation is accepted. A slow response therefore cannot cause the newly ready connection to close in the same poll. Confirmed display updates run before disconnect; the connection is not kept open indefinitely.
+
+A physical volume-key edge requests one step. A held volume key can repeat after a 400 ms initial ready interval, then at intervals of at least 120 ms after confirmation. Repetition requires an active connection and `SS_READY`, so a slow or unavailable peer cannot accumulate a backlog of timed repeats. Mute remains edge-triggered. Releasing the key stops repeat callbacks; an already transmitted write may still complete.
 
 ## Display timing
 
@@ -53,8 +55,10 @@ The extension occupies 424 bytes of retained lower SRAM, from `0x200039D8` to `0
 
 Tests overwrite the upper bank to verify preservation of volume control and the remembered mute level. Complete battery removal resets runtime state, including the remembered level and last-known volume.
 
+The native inactivity counter uses LPTIMER1, which is separate from the 16 MHz Timer1 used for BLE scheduling. LAB18 keeps the inactivity peripheral running while temporarily masking its interrupt during radio ownership. Release restores the previous interrupt enable state and preserves a pending inactivity interrupt. The stock timeout and sleep routines then resume, including after selection of another profile. See [power management](power-management.md) for the LAB17 regression and its validation.
+
 ## Boot defaults and configuration
 
-LAB17 boots enabled with TX mode 10, RX-clear mode 2, and a 72 µs TX lead. These are the settings previously used for successful physical control. Unknown volume starts as `---`; no guessed percentage is shown.
+LAB19 boots enabled with TX mode 10, RX-clear mode 2, and a 72 µs TX lead. These are the settings previously used for successful physical control. Unknown volume starts as `---`; no guessed percentage is shown.
 
 Diagnostic commands use a bounded 20-byte FFF4/FFF3 exchange. They do not provide arbitrary memory access. OTA preparation still requires disabled, idle control. Post-update verification checks the actual revision, build identifier, enabled state, and radio defaults before recording a successful installation.

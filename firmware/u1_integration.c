@@ -22,7 +22,7 @@ struct u1_runtime {
     uint8_t phase:2,enabled:1,request:1,probe:2,stop_requested:1,mute_pending:1;
     uint8_t tx_mode,last_volume,last_reason,last_state;
     uint8_t saved_volume,shown_volume,battery;
-    uint8_t muted:1,shown_muted:1,screen_valid:1;
+    uint8_t muted:1,shown_muted:1,screen_valid:1,repeating:1;
 };
 static struct u1_runtime runtime;
 static const uint8_t own_le[6]={0xab,0x2e,0x00,0x03,0x21,0x20};
@@ -150,11 +150,17 @@ static void apply_mute(void) {
 }
 unsigned u1_key_gateway(unsigned profile,unsigned button) {
     if(runtime.enabled && !ap_configuration_connected() && soundsend_profile(profile) && (button==4 || button==10 || button==13)) {
-        /* Executed stock9c54 calls this handler every loop while held. It
-         * sets current136 before the call, previous135 after it, and clears
-         * both at release. Count that physical edge, not each callback. */
+        /* Stock9c54 calls every loop while held. A physical edge gives one
+         * immediate step. Held volume repeats after400ms, then every120ms,
+         * only after confirmation. Never queue a catch-up burst while the
+         * peer is absent or a write is unconfirmed. Mute remains edge-only. */
         if(R8(0x20000136)==button && R8(0x20000135)!=button) {
+            runtime.repeating=0;
             if(button==13) request_mute();else request_volume(button==4 ? 1 : -1);
+        } else if(button!=13 && R8(0x20000136)==button && runtime.phase==RT_ACTIVE &&
+                  !runtime.central.closing && runtime.central.client.state==SS_READY &&
+                  (uint32_t)(ap_now()-runtime.last_key)>=US(runtime.repeating ? 120000 : 400000)) {
+            runtime.repeating=1;request_volume(button==4 ? 1 : -1);
         }
         return 0;
     }
@@ -164,7 +170,7 @@ unsigned u1_key_gateway(unsigned profile,unsigned button) {
 }
 unsigned u1_debug_command(const uint8_t request[20],uint8_t response[20]) {
     unsigned i,sum=0;uint8_t command=request[3];
-    if(request[0]!=0x53 || request[1]!=0x53 || request[2]!=1 || command<1 || command>13) return 0;
+    if(request[0]!=0x53 || request[1]!=0x53 || request[2]!=1 || command<1 || command>14) return 0;
     for(i=0;i<19;i++) sum+=request[i];
     if((uint8_t)sum!=request[19]) return 0;
     if(command==2) {
@@ -231,6 +237,10 @@ unsigned u1_debug_command(const uint8_t request[20],uint8_t response[20]) {
     } else if(command==11) {
         response[4]=(uint8_t)ap_tx_lead_us(&runtime.port);response[5]=runtime.phase;
         response[16]=runtime.tx_mode;response[17]=runtime.port.error;
+    } else if(command==14) {
+        uint32_t values[3]={R32(0x200000c4),R32(0x200000c8),R32(0x50006014)};
+        for(i=0;i<12;i++) response[4+i]=(uint8_t)(values[i/4]>>(8*(i%4)));
+        response[16]=R8(0x20000162);response[17]=(uint8_t)ap_legacy_state();
     } else if(command==9 || command==10 || command==13) {
         uint32_t values[3];
         if(command==9) {
@@ -261,7 +271,8 @@ unsigned u1_echo_gateway(uint8_t *data,const void *attribute,unsigned length) {
         (data,attribute,length);
 }
 static void active_poll(void) {
-    const struct radio_action *a;uint32_t now=ap_now();int volume;unsigned pass;
+    const struct radio_action *a;uint32_t now=ap_now();int volume;
+    unsigned pass,client_before=runtime.central.client.state;
     if(runtime.probe==2) {
         if((int32_t)(now-runtime.last_key)<0) return;
         if(!ap_beacon(&runtime.port,own_le,37+runtime.attempts%3)) {finish(runtime.port.error);return;}
@@ -290,8 +301,14 @@ static void active_poll(void) {
         int16_t queued=runtime.queued_delta;uint8_t pending=runtime.request,mute=runtime.mute_pending;
         finish(0);runtime.queued_delta=queued;runtime.request=pending;runtime.mute_pending=mute;return;
     }
+    /* Discovery or a write confirmation can take longer than the warm
+     * interval. Start the ready window when the operation actually completes,
+     * before considering idle close. Otherwise READY may last only this poll
+     * and the next native held-key callback never gets a chance to repeat. */
+    if(client_before!=SS_READY && runtime.central.client.state==SS_READY)
+        runtime.last_key=now;
     apply_mute();show_confirmed_change();
-    if(runtime.central.client.state==SS_READY && (uint32_t)(now-runtime.last_key)>=US(500000))
+    if(runtime.central.client.state==SS_READY && (uint32_t)(now-runtime.last_key)>=US(800000))
         bc_disconnect(&runtime.central,now);
 }
 unsigned u1_poll_prepare(void) {

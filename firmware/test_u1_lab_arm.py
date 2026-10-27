@@ -22,7 +22,7 @@ class Machine(ArmClient):
         for address in (0x40000000,0x50000000):self.machine.mem_map(address,0x10000)
         self.machine.mem_map(0x40010000,0x10000);self.machine.mem_map(0xE000E000,0x1000)
         self.call_stack=self.symbols['__ss_stack_top'];self.lowest_sp=self.call_stack
-        self.clock=0;self.timer_start=0;self.timer_running=False;self.irq=0xFFFFFFFF
+        self.clock=0;self.timer_start=0;self.timer_running=False;self.irq=0xFFFFFFFF;self.irq_pending=0
         self.timer_value=0;self.timer_reload=0;self.timer_frozen=False;self.timer_requires_irq_enable=False
         self.rf_state="idle";self.packet=None;self.response=None;self.tx_end=None
         self.ad_end=None;self.rssi_index=0;self.constant_rssi=False;self.transmit_works=True
@@ -44,6 +44,7 @@ class Machine(ArmClient):
         self.stock_key_dispatch_fixture=False;self.stub_screen=True;self.screen_calls=0;self.screen_lines=[]
         self.battery_level=85;self.battery_reads=0;self.separator_clears=0
         self.stub_ascii=True;self.screen_times=[];self.screen_delay=0
+        self.native_sleep_fixture=False;self.sleep_entries=0
         self.machine.hook_add(UC_HOOK_CODE,self.code)
         self.machine.hook_add(UC_HOOK_MEM_READ,self.read)
         self.machine.hook_add(UC_HOOK_MEM_WRITE,self.write)
@@ -65,6 +66,9 @@ class Machine(ArmClient):
         self.machine.reg_write(UC_ARM_REG_PC,self.machine.reg_read(UC_ARM_REG_LR))
     def code(self,uc,pc,size,data):
         self.clock+=1
+        if self.native_sleep_fixture:
+            if pc==0x10A4:self.ret();return
+            if pc==0x123C:self.sleep_entries+=1;uc.emu_stop();return
         if pc==self.symbols['ble_encode_packet']&~1:self.clock+=self.codec_delay
         if pc==self.symbols['bc_connect_payload']&~1:
             self.connect_build_times.append(self.clock);self.clock+=self.connect_build_delay
@@ -152,6 +156,7 @@ class Machine(ArmClient):
             self.put32(0x40001004,value)
         elif address==0xE000E180:self.irq&=~value
         elif address==0xE000E100:self.irq|=value
+        elif address==0xE000E280:self.irq_pending&=~value
         elif address==0x50001010:
             # Updated from physical LAB12 comparison: zero left stale EOP,
             # write1400 accepted a fresh peer. Public EOP prose is ambiguous.
@@ -267,7 +272,7 @@ class Machine(ArmClient):
         self.machine.emu_start(0x10819,0x1086A,count=10000)
         if self.machine.reg_read(UC_ARM_REG_PC)!=0x1086A:raise AssertionError('Original echo fragment did not finish')
         return bytes(self.machine.mem_read(0x200032AE,27))
-    def run_until_idle(self,limit=3000):
+    def run_until_idle(self,limit=5000):
         entered=False
         for _ in range(limit):
             self.poll();self.clock+=ticks(250)
@@ -276,9 +281,149 @@ class Machine(ArmClient):
             if (entered or self.restore_calls) and not phase:return self.debug(1)
         raise AssertionError(('Runtime did not become idle',self.debug(1).hex(),self.tx[-3:]))
 
+    def native_idle_tick(self):
+        # The real LPTIMER1 interrupt is gated by its peripheral and NVIC.
+        # Its original ARM handler rearms the peripheral and increments C4.
+        if not (self.u32(0x50006014)&1 and self.irq&(1<<24)):return False
+        self.irq_pending&=~(1<<24)
+        self.symbols['stock_idle_tick']=0x7285
+        self.call('stock_idle_tick')
+        return True
+
+    def native_sleep_entry(self):
+        # Execute the original inactivity decision and GPIO/timer shutdown.
+        # Stop at the low-power service entry; no physical sleep is modeled.
+        self.native_sleep_fixture=True
+        self.put32(0x40010000,0xffffffff)
+        self.machine.reg_write(UC_ARM_REG_SP,self.call_stack)
+        self.machine.reg_write(UC_ARM_REG_LR,STOP|1)
+        self.machine.emu_start(0x12A61,STOP,count=300000)
+        self.native_sleep_fixture=False
+
 
 class IntegrationTests(unittest.TestCase):
     def setUp(self):self.m=Machine()
+    def test_inactivity_timer_and_pending_tick_survive_radio_ownership(self):
+        m=self.m;m.put32(0x50006010,0x333);m.put32(0x50006014,0xe7)
+        m.debug(2);m.poll()
+        self.assertEqual(m.u32(0x50006014),0xe7,'Radio acquisition must not stop the unrelated inactivity timer')
+        self.assertFalse(m.irq&(1<<24),'Keep its ISR out of timed radio windows')
+        m.irq_pending|=1<<24
+        m.run_until_idle()
+        self.assertTrue(m.irq_pending&(1<<24),'Do not discard a pending inactivity tick on release')
+        before=m.u32(0x200000c4)
+        self.assertTrue(m.native_idle_tick())
+        self.assertEqual(m.u32(0x200000c4),before+1)
+    def test_native_timeout_reaches_sleep_after_volume_and_profile_exit(self):
+        for profile in (2,1):
+            with self.subTest(profile=profile):
+                m=Machine();m.put32(0x50006014,0xe7);m.put32(0x200000c8,10)
+                m.put8(0x200000ba,10);m.debug(3,1);m.key(2,4);m.run_until_idle()
+                m.put8(0x20000103,profile)
+                for _ in range(10):self.assertTrue(m.native_idle_tick())
+                self.assertEqual(m.u32(0x200000c4),10)
+                m.native_sleep_entry()
+                self.assertEqual(m.sleep_entries,1,'Original sleep path must remain reachable on both profiles')
+                self.assertEqual(m.u32(0x50006014)&1,0,'Native sleep stops the inactivity timer itself')
+    def test_inactivity_timer_survives_failed_and_cancelled_radio_operations(self):
+        for failure in ('entropy','cancel','tx'):
+            with self.subTest(failure=failure):
+                m=Machine();m.put32(0x50006014,0xe7)
+                if failure=='entropy':m.constant_rssi=True
+                if failure=='tx':m.transmit_works=False
+                m.debug(2);m.call('u1_poll_gateway',1,2,3,4,instruction_limit=2500000)
+                if failure=='cancel':m.call('u1_key_gateway',1,4)
+                else:m.run_until_idle()
+                self.assertTrue(m.native_idle_tick())
+                self.assertEqual(m.u32(0x200000c4),1)
+    def test_preexisting_disabled_inactivity_timer_is_not_force_enabled(self):
+        m=self.m;m.irq&=~(1<<24);m.put32(0x50006014,0)
+        m.debug(2);m.run_until_idle()
+        self.assertEqual(m.u32(0x50006014),0);self.assertFalse(m.irq&(1<<24))
+    def test_power_diagnostic_reads_native_state_without_changing_it(self):
+        import sys
+        sys.path.insert(0,str(ROOT.parent))
+        from u1_debug import decode_response
+        m=self.m;m.put32(0x200000c4,7);m.put32(0x200000c8,10)
+        m.put32(0x50006014,0xe7);m.put8(0x20000162,3)
+        before=bytes(m.machine.mem_read(0x200000c4,8))
+        state=decode_response(m.debug(14),14)
+        self.assertEqual((state['idle_ticks'],state['idle_timeout_ticks'],state['screen_mode']),(7,10,3))
+        self.assertTrue(state['inactivity_timer_running']);self.assertEqual(state['lab_protocol_revision'],19)
+        self.assertEqual(bytes(m.machine.mem_read(0x200000c4,8)),before)
+        self.assertEqual(m.u32(0x50006014),0xe7)
+    def test_held_volume_repeats_at_bounded_rate_and_stops_on_release(self):
+        for button,start in ((4,18),(10,30)):
+            with self.subTest(button=button):
+                m=Machine();m.peer.volume=start;m.debug(3,1)
+                m.symbols['stock_dispatch']=0x9C55;m.put8(0x20000162,3)
+                m.put32(0x20000108,1<<(button-1));m.put32(0x2000010c,0)
+                began=m.clock
+                while m.clock-began<ticks(1200000):
+                    m.call('stock_dispatch');m.poll();m.clock+=ticks(250)
+                self.assertGreaterEqual(len(m.peer.writes),4)
+                self.assertLessEqual(len(m.peer.writes),9,'No catch-up burst or callback-rate repeats')
+                direction=1 if button==4 else -1
+                self.assertEqual(m.peer.writes,list(range(start+direction,m.peer.writes[-1]+direction,direction)))
+                m.put32(0x20000108,0);m.call('stock_dispatch');m.run_until_idle(limit=5000)
+                count=len(m.peer.writes)
+                for _ in range(100):m.call('stock_dispatch');m.poll();m.clock+=ticks(1000)
+                self.assertEqual(len(m.peer.writes),count)
+                self.assertEqual(m.restore_calls,1,'A held key should reuse one connection')
+    def test_held_volume_does_not_queue_repeats_before_volume_is_known(self):
+        m=self.m;m.debug(3,1);m.key(2,4)
+        for _ in range(20):
+            m.clock+=ticks(200000);m.call('u1_key_gateway',2,4)
+        s=m.run_until_idle(limit=5000)
+        self.assertEqual(s[8],19);self.assertEqual(m.peer.writes,[19])
+    def test_long_hold_keeps_mute_edge_only_and_volume_within_bounds(self):
+        for button,volume,expected in ((13,18,0),(4,99,100),(10,1,0)):
+            with self.subTest(button=button):
+                m=Machine();m.peer.volume=volume;m.debug(3,1);m.key(2,button);began=m.clock
+                while m.clock-began<ticks(1200000):
+                    m.call('u1_key_gateway',2,button);m.poll();m.clock+=ticks(250)
+                m.put8(0x20000136,0);m.put8(0x20000135,0);m.run_until_idle()
+                self.assertEqual(m.peer.writes,[expected])
+                self.assertEqual(m.restore_calls,1)
+    def test_successive_press_after_600ms_reuses_live_connection(self):
+        m=self.m;m.debug(3,1);m.key(2,4);began=m.clock
+        while m.clock-began<ticks(600000):m.poll();m.clock+=ticks(250)
+        self.assertEqual(m.restore_calls,0)
+        self.assertEqual(m.debug(1)[5],2)
+        m.key(2,4);m.run_until_idle(limit=5000)
+        self.assertEqual(m.peer.writes,[19,20]);self.assertEqual(m.restore_calls,1)
+    def delay_first_peer_response(self,m,volume_write=False):
+        original_reply=m.peer.reply;pending=[];release_at=[0];delayed=[False]
+        def slow_response(action):
+            if pending and m.clock>=release_at[0]:return pending.pop()
+            response=original_reply(action)
+            if response and not delayed[0] and (not volume_write or m.peer.writes):
+                delayed[0]=True;pending.append(response);release_at[0]=m.clock+ticks(900000);return b''
+            return response
+        m.peer.reply=slow_response
+    def test_held_volume_survives_discovery_longer_than_warm_timeout(self):
+        for volume_write in (False,True):
+            with self.subTest(delayed_write_confirmation=volume_write):
+                m=Machine();self.delay_first_peer_response(m,volume_write);m.debug(3,1)
+                m.symbols['stock_dispatch']=0x9C55;m.put8(0x20000162,3)
+                m.put32(0x20000108,1<<3);m.put32(0x2000010c,0);began=m.clock
+                while m.clock-began<ticks(2100000):
+                    m.call('stock_dispatch');m.poll();m.clock+=ticks(250)
+                self.assertGreaterEqual(len(m.peer.writes),4,'A delayed first confirmation must not close before held-key service')
+                self.assertEqual(m.peer.writes,list(range(19,m.peer.writes[-1]+1)))
+                m.put32(0x20000108,0);m.call('stock_dispatch');m.run_until_idle()
+                self.assertEqual(m.restore_calls,1)
+    def test_warm_window_starts_after_slow_confirmation(self):
+        m=self.m;self.delay_first_peer_response(m);m.debug(3,1);m.key(2,4)
+        for _ in range(8000):
+            m.poll();m.clock+=ticks(250)
+            if m.debug(1)[8]==19:break
+        else:self.fail('No initial confirmation')
+        confirmed=m.clock
+        while m.clock-confirmed<ticks(600000):m.poll();m.clock+=ticks(250)
+        self.assertEqual(m.restore_calls,0,'Keep the warm window after a slow successful operation')
+        m.key(2,4);m.run_until_idle()
+        self.assertEqual(m.peer.writes,[19,20]);self.assertEqual(m.restore_calls,1)
     def test_daily_boot_enables_dedicated_keys_with_verified_radio_defaults(self):
         m=self.m;m.call('u1_runtime_init');s=m.debug(1)
         self.assertEqual(s[4:6],b'\1\0');self.assertEqual(s[8:10],b'\xff\x0a')
@@ -507,8 +652,8 @@ class IntegrationTests(unittest.TestCase):
         sys.path.insert(0,str(ROOT.parent))
         from u1_debug import decode_response
         state=decode_response(self.m.debug(5),5)
-        self.assertEqual(state['build_id'],'0x544d5248')
-        self.assertEqual(state['lab_protocol_revision'],17)
+        self.assertEqual(state['build_id'],'0x544d524a')
+        self.assertEqual(state['lab_protocol_revision'],19)
         self.assertEqual(state['clock_before'],0);self.assertEqual(state['clock_after'],0)
         self.assertEqual(state['port_error'],0);self.assertEqual(self.m.tx,[])
     def test_read_only_radio_snapshot_does_not_start_radio(self):
@@ -517,7 +662,7 @@ class IntegrationTests(unittest.TestCase):
         from u1_debug import decode_response
         state=decode_response(self.m.debug(6),6)
         self.assertEqual(state['rf_status'],'0x0');self.assertEqual(state['rf_header'],'0x0')
-        self.assertEqual(state['rf_control'],'0x0');self.assertEqual(state['lab_protocol_revision'],17)
+        self.assertEqual(state['rf_control'],'0x0');self.assertEqual(state['lab_protocol_revision'],19)
         self.assertEqual(self.m.tx,[])
     def test_lab_mode3_matches_stock_ble_control_before_rx(self):
         m=self.m;m.symbols['stock_ble_control_start']=0x6CD
@@ -555,7 +700,7 @@ class IntegrationTests(unittest.TestCase):
         self.assertEqual(state[7],0x86)
         tx=decode_response(m.debug(7),7)
         self.assertEqual(tx['intended_tx_header'],'0x2205');self.assertEqual(tx['tx_mode'],4)
-        self.assertEqual(tx['lab_protocol_revision'],17);self.assertEqual(tx['port_error'],0x86)
+        self.assertEqual(tx['lab_protocol_revision'],19);self.assertEqual(tx['port_error'],0x86)
         self.assertEqual(m.tx,[])
     def test_execute_original_advertising_fragment_records_engine_header_then_fifo(self):
         m=self.m
@@ -714,7 +859,7 @@ class IntegrationTests(unittest.TestCase):
         self.assertEqual(m.peer.writes,[]);self.assertEqual(m.restore_calls,1)
     def test_key_during_termination_is_carried_to_a_new_connection(self):
         m=self.m;m.debug(3,1);m.key(2,4)
-        for _ in range(3000):
+        for _ in range(5000):
             m.poll();m.clock+=ticks(250)
             if m.tx and m.tx[-1]['payload']==bytes.fromhex('02 13'):break
         else:self.fail('No graceful termination was transmitted')

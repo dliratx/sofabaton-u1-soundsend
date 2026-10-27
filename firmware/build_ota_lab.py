@@ -61,6 +61,7 @@ def build():
         'scope':'Offline experimental OTA file. Live update entry/transport, FW33 compatibility, RF and recovery after failure remain unverified.',
         'installed':False,'live_upload_authorized_in_this_build':False,
         'lab_disabled_on_reset':manifest['lab_disabled_on_reset'],'soundsend_firmware_changes':False,
+        'lab_protocol_revision':manifest['lab_protocol_revision'],'lab_build_id':manifest['lab_build_id'],
     }
     (ROOT/'u1-lab-ota-plan.json').write_text(json.dumps(plan,indent=2)+'\n',encoding='utf-8')
     manifest['ota_package_generated']=True

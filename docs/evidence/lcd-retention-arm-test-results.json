@@ -1,7 +1,7 @@
 {
   "tests_run": 2,
   "passed": true,
-  "module_sha256": "11c67f2b749737d6fe53c9485da16d89e02929f49cd172ce89a4f1b8855726b2",
-  "image_sha256": "0aaf32ca2308d7252fe5b7f28edcd4bd74a3d263148f6d0c4dc16999d9d62232",
+  "module_sha256": "6a22192acad4fb431b6d366188428e69929f8cc87c828649b093dbb80f00c791",
+  "image_sha256": "95079f7b4884a7674f267ec0b4514c6ec3bc39617531f8c4ed22b4809f1f6745",
   "scope": "Actual patched ARM state/control survives modeled complete LCD-SRAM loss; RF/timer remain modeled. Not a physical sleep/RF test."
 }

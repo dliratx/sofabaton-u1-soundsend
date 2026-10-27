@@ -26,7 +26,9 @@ Only the **U1 firmware** is modified. SoundSend retains its original firmware. B
 
 ## Current status
 
-**LAB17 / TMRH was installed and its actual boot verified on 2026-10-27 at 05:07:36 UTC.** It starts with the dedicated controls enabled and the previously verified radio configuration. The vendor application still identifies the underlying firmware as version 32; custom diagnostics identify revision 17.
+**LAB18 / TMRI is installed; LAB19 / TMRJ is the validated source candidate awaiting installation.** LAB18's actual boot was verified on 2026-10-27 at 16:08:45 UTC. A read-only hardware probe retrieved SoundSend's volume and verified that the inactivity counter continued advancing after radio release. Its physical held-volume test still produced only one change.
+
+LAB19 passed **134 offline tests** and corrects a delayed-response case that reproduces that failure. It starts the ready interval when SoundSend confirms the operation, preserving time for held-key repetition and a subsequent press. Installation is pending access to the U1 in Pairing mode. The vendor application reports version 32 for this V32-based extension; custom diagnostics distinguish LAB revisions.
 
 | Capability | Evidence |
 | --- | --- |
@@ -34,16 +36,20 @@ Only the **U1 firmware** is modified. SoundSend retains its original firmware. B
 | One volume step per physical press | Implemented and ARM-tested; up/down operation confirmed through manual testing |
 | Dedicated SoundSend profile | Read back from the remote; other profiles preserved |
 | Stable volume screen without profile-menu flash | LAB16 correction confirmed through manual testing |
-| Mute and restore previous volume | Implemented and emulation-tested in LAB17; physical button confirmation pending |
-| Earlier display update and battery percentage | Implemented and tested in LAB17; physical display confirmation pending |
-| Controls enabled after boot | Verified in the actual LAB17 post-update boot |
-| Offline validation | **123 tests passed** across seven suites |
+| Native inactivity timer after Bluetooth use | Verified advancing on hardware; automatic screen-off confirmation pending |
+| Gradual volume repetition while held | Physical LAB18 test failed; LAB19 correction passed offline tests and awaits installation |
+| Mute and restore previous volume | Implemented and emulation-tested; physical button confirmation pending |
+| Earlier display update and battery percentage | Implemented and tested; physical display confirmation pending |
+| Controls enabled after boot | Verified in the actual LAB18 post-update boot |
+| Offline validation | **134 tests passed** for LAB19 across seven suites; installed LAB18 passed 132 |
 
 See [validation and installation evidence](docs/validation.md) for exact hashes, limits, and outstanding checks. Test success is not a claim of universal hardware compatibility or proven recovery.
 
 ## Controls
 
 Select the **SoundSend** profile on the U1 and keep the transmitter powered.
+
+The hold behavior below describes LAB19. The installed LAB18 still requires separate volume presses in physical testing.
 
 | Button | Action |
 | --- | --- |
@@ -52,7 +58,9 @@ Select the **SoundSend** profile on the U1 and keep the transmitter powered.
 | Mute | Read the actual level, remember it, and set volume to 0 |
 | Mute again | Restore the remembered level if the actual level is still 0 |
 
-A held button counts once until released. Volume keys leave mute starting from the actual zero level. A different controller's intervening volume change is read before the next operation. The remembered mute level survives normal retained sleep, but not battery removal or a full reset. The installed OLED volume label is `Volumen`; repository documentation is English.
+Holding a volume key repeats gradually after an initial delay. Repeats are paced at least 120 ms apart and require confirmation of the previous operation, preventing a backlog while connecting. Releasing the key stops further repeats; a write already in flight may still complete. Mute toggles once per press.
+
+Volume keys leave mute starting from the actual zero level. A different controller's intervening volume change is read before the next operation. The remembered mute level survives normal retained sleep, but not battery removal or a full reset. The installed OLED volume label is `Volumen`; repository documentation is English.
 
 ## Repository guide
 
@@ -60,6 +68,7 @@ A held button counts once until released. Volume keys leave mute starting from t
 | --- | --- |
 | [docs/problem-and-solution.md](docs/problem-and-solution.md) | Requirements, investigation, and design decisions |
 | [docs/architecture.md](docs/architecture.md) | Firmware modules, timing, memory, and integration |
+| [docs/power-management.md](docs/power-management.md) | Inactivity timer regression, sleep restoration, and volume hold behavior |
 | [docs/protocol.md](docs/protocol.md) | Verified SoundSend messages and U1 controls |
 | [docs/build-and-test.md](docs/build-and-test.md) | Offline build setup and test reproduction |
 | [docs/installation.md](docs/installation.md) | Unit-specific OTA workflow and constraints |

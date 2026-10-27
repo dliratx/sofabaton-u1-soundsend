@@ -1,6 +1,6 @@
 # Firmware source
 
-The current implementation is LAB17 / TMRH. Read the root [README](../README.md) for its actual installation status and [architecture](../docs/architecture.md) for module responsibilities.
+The current implementation is LAB19 / TMRJ. Read the root [README](../README.md) for its actual installation status and [architecture](../docs/architecture.md) for module responsibilities.
 
 - `soundsend_client.*`: SoundSend ATT client and confirmed-volume state.
 - `ble_central.*`: single-peer BLE central and connection lifecycle.

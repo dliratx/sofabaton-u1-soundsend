@@ -88,7 +88,10 @@ int ap_claim(struct a8107_port *p,unsigned tx_mode) {
     p->last_launch_status=0;p->last_tx_header=0;
     lock=irq_lock();p->saved_irq=R32(0xe000e100)&IRQ_MASK;
     R32(0xe000e180)=IRQ_MASK;
-    R8(0x50006004)=0;R8(0x50006014)=0;
+    R8(0x50006004)=0;
+    /* LPTIMER1 at50006010 drives the native inactivity counter (C4).
+     * Keep it running: IRQ24 is masked only during radio ownership. Stopping
+     * this unrelated timer here permanently disabled screen-off and sleep. */
     R32(0x40001000)=0;
     p->saved_adc=R32(0x50001240);p->active=1;irq_restore(lock);
     /* Vendor V32 consistently uses CTRL9. Try documented polling mode first,
@@ -121,7 +124,9 @@ void ap_release(struct a8107_port *p) {
     R32(0x40001000)=0;R32(0x4000100c)=1;
     /* The old BLE link was disconnected. Its expired timer must remain off;
      * the stock advertising stack initializes the next link's timer itself. */
-    R32(0xe000e280)=IRQ_MASK;R32(0xe000e100)=p->saved_irq;
+    /* Preserve a pending inactivity tick; its stock ISR rearms LPTIMER1.
+     * Only discarded BLE/Timer1 events may be cleared on this handoff. */
+    R32(0xe000e280)=IRQ_MASK&~(1u<<24);R32(0xe000e100)=p->saved_irq;
     p->active=0;irq_restore(lock);receive_unlock(p);
     /* Stock routine rebuilds normal SB programming advertisements and resets
      * the original link state. IR/profile/key records are not rewritten.

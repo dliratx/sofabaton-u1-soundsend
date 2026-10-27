@@ -12,11 +12,11 @@ The implementation uses the remote's original OTA handlers. A full application t
 
 The uploader checks the candidate hash, passing reports, recorded installed image, exact device identity, battery threshold, and disabled/idle state. It prepares empty staging, transfers each chunk once with a matching acknowledgement, sends finish and commit, allows dispatch to settle, then reconnects to verify the actual boot revision and build.
 
-The installed LAB17 package is identified in [validation.md](validation.md). A clone deliberately excludes the installation authorization record, raw receipts, installed-history binaries, and personal profile backups. Do not fabricate those files to bypass the guards.
+The installed LAB18 package is identified in [validation.md](validation.md). A clone deliberately excludes the installation authorization record, raw receipts, installed-history binaries, and personal profile backups. Do not fabricate those files to bypass the guards.
 
 ## Boot and normal use
 
-LAB17 enables the dedicated controls at startup with TX mode 10, RX-clear mode 2, and 72 µs lead. Selecting another profile retains its native behavior. While a phone or PC configuration connection is active, the custom button override yields to configuration.
+LAB18 and the LAB19 candidate enable the dedicated controls at startup with TX mode 10, RX-clear mode 2, and 72 µs lead. Selecting another profile retains its native behavior. While a phone or PC configuration connection is active, the custom button override yields to configuration.
 
 The helper `u1_arm_soundsend.py` verifies the exact installed build and profile, sets the known radio configuration, enables control, and requests the native configuration disconnect. It is a development helper, not a required everyday bridge.
 
