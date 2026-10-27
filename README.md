@@ -43,9 +43,9 @@ Click a photo to open the original image. These LAB19 photographs predate the li
 
 ## Current status
 
-**LAB20 / TMRK is ready for installation after passing 139 offline tests and installer preflight. LAB19 / TMRJ remains installed.** LAB20 addresses a native HID reconnection race when returning from Fire TV to SoundSend and adds a connection indicator. Firmware transfer and physical switching validation are pending a new U1 configuration connection.
+**LAB20 / TMRK is installed; its actual boot was verified on 2026-10-27 at 19:44:04 UTC.** All 7,936 transfer blocks were acknowledged. The exact package passed **139 offline tests** and installer preflight. All five profile records were read back unchanged, including the new Fire TV profile. Physical switching confirmation is pending.
 
-Earlier manual feedback accepted LAB19 for SoundSend use. After adding a new Fire TV profile through the app, a separate failure was reported: Fire TV worked, but returning to SoundSend left a cached percentage without working volume commands. A fresh read confirmed all five profiles, including the new Fire TV profile at slot 5. LAB20's correction is validated offline; repeated physical transitions remain to be tested.
+Earlier manual feedback accepted LAB19 for SoundSend use. After adding a new Fire TV profile through the app, a separate failure was reported: Fire TV worked, but returning to SoundSend left a cached percentage without working volume commands. A fresh read confirmed all five profiles, including the new Fire TV profile at slot 5. LAB20's correction is installed and validated offline; repeated physical transitions remain to be tested.
 
 LAB19's actual boot was verified on 2026-10-27 at 16:42:40 UTC after 7,936 acknowledged transfer blocks. Hardware snapshots confirmed that the inactivity counter continued advancing after radio release. Controls enable automatically on a full boot. The vendor application reports version 32 for this V32-based extension; custom diagnostics distinguish LAB revisions. Historical diagnostics and manual feedback remain in the validation record.
 
@@ -54,14 +54,14 @@ LAB19's actual boot was verified on 2026-10-27 at 16:42:40 UTC after 7,936 ackno
 | Direct U1 → SoundSend volume changes | Confirmed through manual testing on earlier installed revisions |
 | One volume step per physical press | Implemented and ARM-tested; up/down operation confirmed through manual testing |
 | Dedicated SoundSend profile | Read back from the remote; other profiles preserved |
-| Fire TV and SoundSend switching | LAB19 failure reported; LAB20 native reconnection regression passes offline; installation and physical confirmation pending |
+| Fire TV and SoundSend switching | LAB19 failure reported; LAB20 correction installed and ARM-tested; physical switching confirmation pending |
 | Stable volume screen without profile-menu flash | LAB16 correction confirmed through manual testing |
 | Native inactivity timer after Bluetooth use | Verified advancing on hardware; native sleep path covered offline |
 | Gradual volume repetition while held | LAB19 delayed-response correction tested offline; subsequent overall manual acceptance recorded |
 | Mute and restore previous volume | Implemented and emulation-tested; no separate manual mute/restore checklist recorded |
 | Volume and battery display | Photographed on the physical remote; no instrumented display-latency measurement |
-| Controls enabled after boot | Verified in the actual LAB19 post-update boot; later manual operation reported working |
-| Offline validation | **139 tests passed** for the LAB20 candidate across seven suites; installed LAB19 previously passed 134 |
+| Controls enabled after boot | Verified in the actual LAB20 post-update boot and again before configuration disconnect |
+| Offline validation | **139 tests passed** for installed LAB20 across seven suites |
 
 See [validation and installation evidence](docs/validation.md) for exact hashes, manual feedback, and measurement limits. Test success is not a claim of universal hardware compatibility or proven recovery.
 
@@ -77,7 +77,7 @@ See [connection, reconnection, and changing devices](docs/connection-and-devices
 
 Select the **SoundSend** profile on the U1 and keep the transmitter powered.
 
-The button behavior below is retained from LAB19. Its reported failure after using Fire TV is addressed by the LAB20 candidate described above.
+The button behavior below is retained in LAB20. Its new native Bluetooth handoff and link indicator still require physical switching confirmation.
 
 | Button | Action |
 | --- | --- |
@@ -90,7 +90,7 @@ Holding a volume key repeats gradually after an initial delay. Repeats are paced
 
 Volume keys leave mute starting from the actual zero level. A different controller's intervening volume change is read before the next operation. The remembered mute level survives normal retained sleep, but not battery removal or a full reset. The installed OLED volume label is `Volumen`; repository documentation is English.
 
-The LAB20 candidate adds a top-right link indicator: `...` while connecting, `BT` after receiving a valid volume on the active session, `!` after an error, and blank while idle. The displayed percentage remains the last confirmed value. Because the link closes when idle, the `BT` indicator normally disappears after use. See [Bluetooth profile handoff](docs/bluetooth-profile-handoff.md) for the Fire TV-to-SoundSend correction and its validation scope.
+LAB20 adds a top-right link indicator: `...` while connecting, `BT` after receiving a valid volume on the active session, `!` after an error, and blank while idle. The displayed percentage remains the last confirmed value. Because the link closes when idle, the `BT` indicator normally disappears after use. See [Bluetooth profile handoff](docs/bluetooth-profile-handoff.md) for the Fire TV-to-SoundSend correction and its validation scope.
 
 ## Repository guide
 

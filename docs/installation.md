@@ -12,11 +12,11 @@ The implementation uses the remote's original OTA handlers. A full application t
 
 The uploader checks the candidate hash, passing reports, recorded installed image, exact device identity, battery threshold, and disabled/idle state. It prepares empty staging, transfers each chunk once with a matching acknowledgement, sends finish and commit, allows dispatch to settle, then reconnects to verify the actual boot revision and build.
 
-The installed LAB19 package is identified in [validation.md](validation.md). A clone deliberately excludes the installation authorization record, raw receipts, installed-history binaries, and personal profile backups. Do not fabricate those files to bypass the guards.
+The installed LAB20 package is identified in [validation.md](validation.md). A clone deliberately excludes the installation authorization record, raw receipts, installed-history binaries, and personal profile backups. Do not fabricate those files to bypass the guards.
 
 ## Boot and normal use
 
-LAB19 enables the dedicated controls at startup with TX mode 10, RX-clear mode 2, and 72 µs lead. Selecting another profile retains its native behavior. While a phone or PC configuration connection is active, the custom button override yields to configuration.
+LAB20 enables the dedicated controls at startup with TX mode 10, RX-clear mode 2, and 72 µs lead. Selecting another profile retains its native behavior. While a phone or PC configuration connection is active, the custom button override yields to configuration.
 
 For daily use, power SoundSend, disconnect any U1 configuration session, select the dedicated profile, and press a control button. No daily pairing step is needed. The transmitter address is compiled into the extension, so changing SoundSend units currently requires rebuilding and updating the U1. See [connection and changing devices](connection-and-devices.md) for the complete distinction between configuration pairing, normal reconnection, and provisioning another unit.
 

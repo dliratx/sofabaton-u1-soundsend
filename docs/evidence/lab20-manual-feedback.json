@@ -1,0 +1,43 @@
+{
+  "revision": 20,
+  "build_id": "0x544d524b",
+  "recorded_at": "2026-10-27T19:51:22.586026+00:00",
+  "initial_manual_attempt": {
+    "soundsend_volume_responded": false,
+    "displayed_indicator": "!",
+    "projector_reported_powered": true,
+    "iphone_also_reported_unable_to_find_transmitter": true
+  },
+  "diagnostic_after_failure": {
+    "time": "2026-10-27T19:46:24.544876+00:00",
+    "enabled": true,
+    "phase": "idle",
+    "central_state": 6,
+    "reason": 8,
+    "volume": null,
+    "tx_packets": 0,
+    "rx_packets": 2256,
+    "crc_errors": 0,
+    "errors": 632
+  },
+  "initial_ugreen_scan": {
+    "captured_at": "2026-10-27T19:47:08.809802+00:00",
+    "seconds": 15.0,
+    "soundSend_address_seen": false,
+    "total_devices_seen": 16
+  },
+  "scan_after_announced_transmitter_restart": {
+    "captured_at": "2026-10-27T19:49:30.525979+00:00",
+    "soundSend_address_seen": true,
+    "name": "SoundSend",
+    "address": "CC:90:93:18:93:0A",
+    "rssi": -73,
+    "advertisement_count": 5,
+    "pc_connected": false
+  },
+  "source_receipt_sha256": "4b13d7a87dd93d503de33fb60656f587bc1d10a904b8d87bafea977881fb6540",
+  "initial_scan_sha256": "f12fb62489f7396317754ebfcbecb701c19ed409498aa92c5291c620fe7f85f4",
+  "returned_scan_sha256": "3498bda03a9ea13e61a9c8a3a98de4de1d604ef8306b8168c0801e215cb7922e",
+  "successful_repeated_switching_confirmation_pending": true,
+  "scope": "The first manual attempt failed with a scan timeout and no transmitted packets. Neither the UGREEN scan nor the iPhone found SoundSend. Its advertisement reappeared after a transmitter restart was announced. This establishes an availability problem during that attempt, but does not identify why advertising stopped or yet validate repeated profile handoff."
+}

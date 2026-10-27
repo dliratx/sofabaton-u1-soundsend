@@ -8,10 +8,12 @@
   "offline_tests_passed": 139,
   "offline_suites": 7,
   "installer_preflight_passed": true,
-  "installed": false,
-  "current_installed_revision": 19,
+  "installed": true,
+  "current_installed_revision": 20,
   "physical_switching_confirmation_pending": true,
   "validated_at": "2026-10-27T19:35:35.550193+00:00",
   "regression": "The original native post-poll HID retry branch restarted the previous advertiser 27 times in 32 modeled poll iterations. LAB20 ends that retry policy before asynchronous handoff.",
-  "scope": "Compiled ARM and host validation, with modeled radio and hardware. Physical Fire TV-to-SoundSend switching remains to be tested after installation."
+  "scope": "Offline validation of the exact installed package. Actual boot and profile preservation are recorded separately; physical switching confirmation remains pending.",
+  "actual_boot_verified_at": "2026-10-27T19:44:04.421577+00:00",
+  "installation_evidence": "lab20-installation-summary.json"
 }

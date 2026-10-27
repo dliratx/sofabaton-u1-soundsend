@@ -1,0 +1,56 @@
+{
+  "revision": 20,
+  "build_id": "0x544d524b",
+  "actual_boot_verified_at": "2026-10-27T19:44:04.421577+00:00",
+  "default_enabled": true,
+  "radio_defaults": {
+    "tx_mode": 10,
+    "rx_clear_mode": 2,
+    "tx_lead_us": 72
+  },
+  "ota_acknowledged_chunks": 7936,
+  "offline_tests_passed": 139,
+  "offline_suites": 7,
+  "ota_package_sha256": "5db5d7f7c48cc4e0cb32b95ef6f4c66a3bb553114316aee63cf4f208a139f34c",
+  "expected_application_sha256": "f3a5c1f8caedee8b01fd4386bfefb5d1c74a3acaa872eceac56292b683921253",
+  "application_prefix_sha256": "2483e8d222ae47d896d24084f31bbf770c55f85681fb7a4c5fa40c93ac9dcdcc",
+  "source_receipt_sha256": "e351def0e4c09040faf31565e48f439bc6877aa396497b98a77fa79d0a6cecd7",
+  "preparation_receipt_sha256": "eae249f19471609e6715daa181091feceed7a3fd7f2a56658c0621495ccf6372",
+  "profile_readback_receipt_sha256": "6193adc7936954bb8d3f3007e7c3c477a219361dbe0d746c937766cfba89a30f",
+  "profile_metadata_unchanged": true,
+  "preserved_profiles": [
+    {
+      "device_id": 1,
+      "name": "Proyector",
+      "code_type": 2
+    },
+    {
+      "device_id": 4,
+      "name": "HDMI",
+      "code_type": 2
+    },
+    {
+      "device_id": 3,
+      "name": "Android TV",
+      "code_type": 3
+    },
+    {
+      "device_id": 2,
+      "name": "SoundSend",
+      "code_type": 2
+    },
+    {
+      "device_id": 5,
+      "name": "Fire TV",
+      "code_type": 3
+    }
+  ],
+  "original_fire_tv_backup_restored": false,
+  "configuration_disconnect_acknowledged": true,
+  "physical_keys_enabled_after_verification": true,
+  "soundSend_firmware_modified": false,
+  "pc_soundSend_volume_write": false,
+  "physical_switching_confirmation_pending": true,
+  "scope": "Acknowledged full application transfer, actual boot/build/default checks, and unchanged native profile metadata. Expected firmware hashes are not a full physical readback. Subsequent manual failure and transmitter discovery results are recorded separately; successful repeated switching confirmation remains pending.",
+  "subsequent_manual_evidence": "lab20-manual-feedback.json"
+}
