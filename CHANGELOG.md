@@ -6,7 +6,8 @@
 - Added regression coverage for delayed discovery, delayed volume confirmation, and a subsequent press after a slow operation.
 - Passed 134 offline tests across seven suites; the exact OTA candidate passed installer preflight validation.
 - This addresses a timing defect that reproduces LAB18's failed physical hold test; LAB19 physical validation remains pending.
-- Installation is pending access to the U1 in Pairing mode; LAB18 remains installed.
+- Installed with 7,936 acknowledged blocks; actual LAB19 boot, build identity, and enabled defaults verified.
+- Hardware inactivity ticks advanced after radio release. The first read-only SoundSend query failed to establish a working link; final reactivation after diagnostics and manual checks remain pending a new U1 connection.
 
 ## LAB18 — Native sleep restoration and bounded volume repetition
 

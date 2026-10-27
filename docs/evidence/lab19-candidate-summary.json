@@ -7,9 +7,11 @@
   "result_default_enabled": true,
   "offline_tests_passed": 134,
   "offline_suites": 7,
-  "installed": false,
-  "current_installed_revision": 18,
+  "installed": true,
+  "current_installed_revision": 19,
   "physical_validation_pending": true,
   "regression": "LAB18 made one volume write when service discovery was delayed by 900 ms. LAB19 preserves the ready interval after discovery and write confirmation.",
-  "scope": "Offline candidate validation; no LAB19 installation or physical behavior claim."
+  "scope": "Offline validation of the exact candidate subsequently installed; physical behavior remains subject to the installation evidence and manual checks.",
+  "actual_boot_verified_at": "2026-10-27T16:42:40.477994+00:00",
+  "installation_evidence": "lab19-installation-summary.json"
 }

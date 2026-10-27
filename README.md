@@ -26,9 +26,9 @@ Only the **U1 firmware** is modified. SoundSend retains its original firmware. B
 
 ## Current status
 
-**LAB18 / TMRI is installed; LAB19 / TMRJ is the validated source candidate awaiting installation.** LAB18's actual boot was verified on 2026-10-27 at 16:08:45 UTC. A read-only hardware probe retrieved SoundSend's volume and verified that the inactivity counter continued advancing after radio release. Its physical held-volume test still produced only one change.
+**LAB19 / TMRJ is installed; its actual boot was verified on 2026-10-27 at 16:42:40 UTC.** All 7,936 transfer blocks were acknowledged. The installed candidate passed **134 offline tests** and corrects a delayed-response case that reproduced LAB18's failed held-volume test.
 
-LAB19 passed **134 offline tests** and corrects a delayed-response case that reproduces that failure. It starts the ready interval when SoundSend confirms the operation, preserving time for held-key repetition and a subsequent press. Installation is pending access to the U1 in Pairing mode. The vendor application reports version 32 for this V32-based extension; custom diagnostics distinguish LAB revisions.
+Hardware snapshots confirmed that the inactivity counter continued advancing after radio release. The first read-only SoundSend query failed to establish a working link. A subsequent PC connection to the U1 timed out, leaving final button reactivation after the diagnostic and physical behavior checks pending. The controls enable automatically on a full boot. The vendor application reports version 32 for this V32-based extension; custom diagnostics identify revision 19.
 
 | Capability | Evidence |
 | --- | --- |
@@ -37,11 +37,11 @@ LAB19 passed **134 offline tests** and corrects a delayed-response case that rep
 | Dedicated SoundSend profile | Read back from the remote; other profiles preserved |
 | Stable volume screen without profile-menu flash | LAB16 correction confirmed through manual testing |
 | Native inactivity timer after Bluetooth use | Verified advancing on hardware; automatic screen-off confirmation pending |
-| Gradual volume repetition while held | Physical LAB18 test failed; LAB19 correction passed offline tests and awaits installation |
+| Gradual volume repetition while held | LAB19 installed and offline-tested; physical confirmation pending |
 | Mute and restore previous volume | Implemented and emulation-tested; physical button confirmation pending |
 | Earlier display update and battery percentage | Implemented and tested; physical display confirmation pending |
-| Controls enabled after boot | Verified in the actual LAB18 post-update boot |
-| Offline validation | **134 tests passed** for LAB19 across seven suites; installed LAB18 passed 132 |
+| Controls enabled after boot | Verified in the actual LAB19 post-update boot; final reactivation after diagnostics pending |
+| Offline validation | **134 tests passed** for installed LAB19 across seven suites |
 
 See [validation and installation evidence](docs/validation.md) for exact hashes, limits, and outstanding checks. Test success is not a claim of universal hardware compatibility or proven recovery.
 
@@ -49,7 +49,7 @@ See [validation and installation evidence](docs/validation.md) for exact hashes,
 
 Select the **SoundSend** profile on the U1 and keep the transmitter powered.
 
-The hold behavior below describes LAB19. The installed LAB18 still requires separate volume presses in physical testing.
+The hold behavior below describes the installed LAB19 implementation and still requires physical confirmation.
 
 | Button | Action |
 | --- | --- |

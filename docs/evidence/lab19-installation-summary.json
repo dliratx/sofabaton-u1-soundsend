@@ -1,0 +1,72 @@
+{
+  "revision": 19,
+  "build_id": "0x544d524a",
+  "actual_boot_verified_at": "2026-10-27T16:42:40.477994+00:00",
+  "default_enabled": true,
+  "radio_defaults": {
+    "tx_mode": 10,
+    "rx_clear_mode": 2,
+    "tx_lead_us": 72
+  },
+  "ota_acknowledged_chunks": 7936,
+  "offline_tests_passed": 134,
+  "ota_package_sha256": "79c0704cab48668e03aceebdab096c1863297e8c3d6ba37822471b259f41473c",
+  "expected_application_sha256": "054665cc6b2ef3f03087d7a7580fcde5c363434257696f23666aeee11350969f",
+  "application_prefix_sha256": "ef9d46286de46e3af2cff8fb50a63d6b7aecc6a69435c8e3d5da0b744edca405",
+  "source_receipt_sha256": "914c3899e31869cc7ce6e326481f779ea9408c5f41a798cb006264c1a071d89d",
+  "read_only_soundsend_probe": {
+    "confirmed_volume": null,
+    "tx_packets": 7,
+    "rx_packets": 11,
+    "crc_errors": 0,
+    "errors": 2,
+    "terminal_reason": 62,
+    "audio_write_requested": false,
+    "succeeded": false
+  },
+  "power_snapshots_after_radio": [
+    {
+      "time": "2026-10-27T16:43:25.603500+00:00",
+      "sample": 0,
+      "idle_ticks": 43,
+      "idle_timeout_ticks": 3600,
+      "inactivity_timer_control": "0xc7",
+      "inactivity_timer_running": true,
+      "screen_mode": 3,
+      "native_ble_state": 3,
+      "lab_protocol_revision": 19
+    },
+    {
+      "time": "2026-10-27T16:43:26.328413+00:00",
+      "sample": 1,
+      "idle_ticks": 44,
+      "idle_timeout_ticks": 3600,
+      "inactivity_timer_control": "0xc7",
+      "inactivity_timer_running": true,
+      "screen_mode": 3,
+      "native_ble_state": 3,
+      "lab_protocol_revision": 19
+    },
+    {
+      "time": "2026-10-27T16:43:27.038577+00:00",
+      "sample": 2,
+      "idle_ticks": 46,
+      "idle_timeout_ticks": 3600,
+      "inactivity_timer_control": "0xc7",
+      "inactivity_timer_running": true,
+      "screen_mode": 3,
+      "native_ble_state": 3,
+      "lab_protocol_revision": 19
+    }
+  ],
+  "inactivity_ticks_advanced": true,
+  "physical_keys_rearmed_after_diagnostic": false,
+  "physical_feature_confirmation_pending": [
+    "automatic screen-off in SoundSend and after leaving the profile",
+    "held volume repeat and stop on release",
+    "perceived volume/display latency",
+    "mute and restore button",
+    "battery display"
+  ],
+  "scope": "Actual boot/build/default checks and hardware inactivity counter snapshots. The first read-only radio query did not establish a working link; physical button and display behavior remains unconfirmed."
+}

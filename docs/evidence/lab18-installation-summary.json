@@ -71,5 +71,17 @@
   "scope": "Expected installed bytes plus actual boot/build/default checks, a read-only radio query, and hardware inactivity counter snapshots; not a physical firmware dump, electrical sleep-current measurement, or proof of physical button/display behavior.",
   "physical_held_volume_repeat_confirmed": false,
   "physical_held_volume_repeat_result": "Manual test failed: holding volume did not produce gradual changes; multiple separate presses were required.",
-  "manual_feedback_at": "2026-10-27T16:15:19.525059+00:00"
+  "manual_feedback_at": "2026-10-27T16:15:19.525059+00:00",
+  "last_operation_before_lab19": {
+    "time": "2026-10-27T16:37:07.260341+00:00",
+    "central_state": 6,
+    "reason": 62,
+    "volume": 48,
+    "tx_packets": 93,
+    "rx_packets": 81,
+    "crc_errors": 16,
+    "errors": 7,
+    "port_error": 0,
+    "scope": "Cumulative diagnostics captured before the next update; these counters do not identify the exact physical press that failed."
+  }
 }
