@@ -1,4 +1,4 @@
-"""Replace only this unit's Fire TV profile with an empty SoundSend profile.
+"""Configure the dedicated SoundSend profile on the validated U1 unit.
 
 Vendor app protocol: wf0.OooO0o0, wy.OooOo0O, qs/ts deletion.
 Default is an offline plan. Never updates firmware or connects to SoundSend.
@@ -141,7 +141,7 @@ async def execute(args, backup):
             if event != 'frame':
                 print(json.dumps(row, ensure_ascii=True), flush=True)
         record('start', backup=str(args.backup), backup_sha256=hashlib.sha256(args.backup.read_bytes()).hexdigest(),
-               operation='delete Fire TV device2 and create empty SoundSend device2')
+               operation='replace original device2 with empty SoundSend device2')
         try:
             async with open_remote(timeout=45) as client:
                 identity = await read_identity(client)
@@ -159,10 +159,10 @@ async def execute(args, backup):
                     if before[did]['raw_record'] != old[did]['raw_record']:
                         raise RuntimeError(f'Profile{did} changed since backup')
                 if before[2]['name'] != 'Fire TV':
-                    raise RuntimeError('Only Fire TV device2 may be deleted')
+                    raise RuntimeError('Unexpected original profile name for device2')
                 record('profile_snapshot_verified', profiles=list(before.values()))
                 await channel.transaction([frame(20)], 'delete preamble')
-                await channel.transaction([frame(9, b'\x02')], 'delete Fire TV device2')
+                await channel.transaction([frame(9, b'\x02')], 'delete validated original device2')
                 deleted = metadata(await channel.query(10))
                 if set(deleted) != set(old)-{2}:
                     raise RuntimeError('Unexpected device set after delete')

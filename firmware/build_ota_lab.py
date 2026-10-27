@@ -46,7 +46,7 @@ def build():
     PACKAGE.write_bytes(package)
     plan={
         'package':PACKAGE.name,'package_sha256':digest(package),'bytes':len(package),
-        'base':'Downloaded V32, HW3 / batch20190404; current user firmware33 is not backed up',
+        'base':'Vendor V32, HW3 / batch20190404; no original FW33 backup is available',
         'transfer_start':'0x00000','transfer_end_inclusive':'0x1efff',
         'staging_start':'0x20000','staging_end_inclusive':'0x3efff',
         'boot_descriptor_transferred':True,'chunk_data_bytes':16,'data_packets':len(frames),

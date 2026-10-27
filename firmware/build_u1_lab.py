@@ -75,7 +75,7 @@ def create_image():
         'Intercept diagnostics at the original FFF4 echo dispatch; ordinary writes retain original notification path')
     # Preserve metadata, persistent settings, bootloader and the downloaded source.
     if image[0x1EF80:]!=original[36+0x1EF80:]:raise AssertionError("Protected tail changed")
-    report={"base_file":str(BASE),"base_sha256":BASE_SHA,"target":"Downloaded V32 HW3/lote20190404 ONLY; not FW33",
+    report={"base_file":str(BASE),"base_sha256":BASE_SHA,"target":"Vendor V32, HW3 / batch20190404 only; not FW33",
             "module_sha256":hashlib.sha256(elf).hexdigest(),"raw_image_sha256":hashlib.sha256(image).hexdigest(),
             "patches":patches,"ram_start":hex(symbols['__ss_ram_start']),"ram_end":hex(symbols['__ss_ram_end']),
             "main_stack_limit":hex(symbols['__ss_stack_limit']),"main_stack_top":hex(symbols['__ss_stack_top']),

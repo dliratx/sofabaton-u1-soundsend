@@ -40,7 +40,7 @@ Two pending mute toggles before a query completes cancel each other. Muting an a
 
 The native dispatcher repeatedly invokes the key handler while a key is held. Current key byte `0x20000136` and previous key byte `0x20000135` identify a physical edge. Counting handler calls instead caused the original runaway-to-0/100 defect.
 
-The dedicated profile has device ID 2 and the native name `SoundSend`. Its empty native key table is intentional. Other profile records and their 50 assigned keys were verified after replacement of the former Fire TV profile.
+The dedicated profile has device ID 2 and the native name `SoundSend`. Its empty native key table is intentional: firmware hooks handle volume and mute when this profile is selected. Configuration readback verified that the other three profiles retained their 50 assigned keys after the dedicated profile was configured.
 
 ## U1 development interfaces
 

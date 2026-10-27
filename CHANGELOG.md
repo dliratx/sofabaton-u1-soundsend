@@ -15,7 +15,7 @@
 
 - Bypassed the native profile-list renderer for a valid SoundSend selection.
 - Preserved native selection repair, low-battery handling, and other profiles.
-- Owner confirmed the flicker correction and reported display latency.
+- Manual testing confirmed the flicker correction; display latency remained observable.
 
 ## LAB15 — Physical key edges and dedicated profile
 
@@ -23,12 +23,12 @@
 - Cleared completed acquisition requests to prevent unsolicited reconnections.
 - Restricted interception to the named SoundSend profile.
 - Added the confirmed-volume OLED view.
-- Replaced Fire TV with SoundSend and verified preservation of the other profiles.
+- Configured the dedicated SoundSend profile and verified preservation of the other profiles.
 
 ## LAB14 — Direct control established
 
 - Removed extra connection-packet construction from the tight initiating interval.
 - Achieved direct U1-to-SoundSend volume control on the studied hardware.
-- Physical feedback exposed the held-key repetition issue corrected in LAB15.
+- Manual testing identified the held-key repetition issue corrected in LAB15.
 
 Earlier revisions established diagnostics, OTA transport, retained memory placement, packet encoding, radio launch behavior, and timing compensation. Their incomplete claims are not presented as current implementation status.

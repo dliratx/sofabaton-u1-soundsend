@@ -1,16 +1,16 @@
 # SofaBaton U1 → WiSA SoundSend
 
-Direct Bluetooth volume control from a SofaBaton U1 remote to a WiSA SoundSend transmitter, without a computer, phone, hub, or bridge during everyday use.
+Direct Bluetooth volume and mute control from a SofaBaton U1 remote to a WiSA SoundSend transmitter, without a computer, phone, hub, or bridge during everyday use.
 
-This repository documents an experiment on an owned U1 hardware revision 3 unit. It includes the Cortex-M0 firmware extension, Windows development tools, ARM emulation tests, and the evidence behind the implementation.
+This repository contains a Cortex-M0 firmware extension for U1 hardware revision 3, Windows development tools, ARM emulation tests, and protocol and validation documentation.
 
 ## The problem
 
-The SoundSend volume was controllable through its iPhone app, but the projector's HDMI-CEC volume control did not work. The owner wanted to use the U1's physical volume and mute buttons directly. Both devices having Bluetooth was insufficient: the remote needed to initiate the SoundSend control protocol, rather than send an ordinary remote-control key code.
+When HDMI-CEC volume control is unavailable, the SoundSend app remains a working control interface, but it does not provide physical remote buttons. Direct control from the U1 requires a Bluetooth central that implements SoundSend's GATT protocol: service discovery, notification subscription, volume queries, and volume writes. A conventional Bluetooth remote-control key mapping does not provide those operations.
 
 ## The solution
 
-The U1 firmware was extended with a small BLE central, a SoundSend ATT client, and hooks into the remote's key and display routines. A dedicated **SoundSend** profile replaces the former Fire TV profile. The extension reads the actual volume, sends a bounded change, and shows the value confirmed by the transmitter.
+The U1 firmware extension implements a small BLE central, a SoundSend ATT client, and hooks into the remote's key and display routines. Selecting the dedicated **SoundSend** profile activates this control path. The extension reads the actual volume, sends a bounded change, and shows the value confirmed by the transmitter.
 
 ```mermaid
 flowchart TD
@@ -30,10 +30,10 @@ Only the **U1 firmware** is modified. SoundSend retains its original firmware. B
 
 | Capability | Evidence |
 | --- | --- |
-| Direct U1 → SoundSend volume changes | Confirmed by the owner on earlier installed revisions |
-| One volume step per physical press | Implemented and ARM-tested; owner confirmed up/down operation |
+| Direct U1 → SoundSend volume changes | Confirmed through manual testing on earlier installed revisions |
+| One volume step per physical press | Implemented and ARM-tested; up/down operation confirmed through manual testing |
 | Dedicated SoundSend profile | Read back from the remote; other profiles preserved |
-| Stable volume screen without profile-menu flash | Owner confirmed LAB16 correction |
+| Stable volume screen without profile-menu flash | LAB16 correction confirmed through manual testing |
 | Mute and restore previous volume | Implemented and emulation-tested in LAB17; physical button confirmation pending |
 | Earlier display update and battery percentage | Implemented and tested in LAB17; physical display confirmation pending |
 | Controls enabled after boot | Verified in the actual LAB17 post-update boot |
@@ -52,7 +52,7 @@ Select the **SoundSend** profile on the U1 and keep the transmitter powered.
 | Mute | Read the actual level, remember it, and set volume to 0 |
 | Mute again | Restore the remembered level if the actual level is still 0 |
 
-A held button counts once until released. Volume keys leave mute starting from the actual zero level. A different controller's intervening volume change is read before the next operation. The remembered mute level survives normal retained sleep, but not battery removal or a full reset. The on-device labels retain the owner's existing language; repository documentation is English.
+A held button counts once until released. Volume keys leave mute starting from the actual zero level. A different controller's intervening volume change is read before the next operation. The remembered mute level survives normal retained sleep, but not battery removal or a full reset. The installed OLED volume label is `Volumen`; repository documentation is English.
 
 ## Repository guide
 

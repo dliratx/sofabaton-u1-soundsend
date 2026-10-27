@@ -30,13 +30,13 @@ The expected installed hash is derived from the acknowledged candidate plus veri
 
 ## Physical evidence already obtained
 
-The owner confirmed that the U1 directly changed SoundSend volume. The first implementation repeated a held key and ran to an endpoint; later key-edge handling corrected that behavior. The owner then confirmed volume-up/down operation and the LAB16 correction for the device-list flash.
+Manual testing confirmed direct U1-to-SoundSend volume changes. The initial key handler counted repeated callbacks during a held press, causing volume to reach 0 or 100. Key-edge handling corrected this behavior; subsequent manual testing confirmed volume-up/down operation and the LAB16 correction for the device-list flash. These observations are manual functional results, not instrumented RF or latency measurements.
 
-The dedicated SoundSend profile was read back from the remote. The other three profiles retained their 50 assigned keys after the Fire TV replacement. LAB17's post-update diagnostics verified the actual revision, exact build, enabled state, and radio defaults.
+The dedicated SoundSend profile was read back from the remote. The other three profiles retained their 50 assigned keys after the dedicated profile was configured. LAB17's post-update diagnostics verified the actual revision, exact build, enabled state, and radio defaults.
 
 ## Pending physical checks
 
-The new LAB17 feature behavior still needs owner confirmation: one mute press silences, a second restores the previous level, the battery appears, and the display responds sooner. Long-duration RF reliability, battery consumption, independent power-cycle behavior over repeated cycles, and recovery after a failed update are not established by the offline tests.
+Physical validation remains pending for LAB17 mute/restore behavior, battery display, and perceived display latency. The required checks are that one mute press silences playback, a second restores the previous level, the battery value appears, and confirmed volume changes reach the display sooner. Long-duration RF reliability, battery consumption, independent power-cycle behavior over repeated cycles, and recovery after a failed update are not established by the offline tests.
 
 ## Evidence included in Git
 
