@@ -18,6 +18,8 @@ The installed LAB19 package is identified in [validation.md](validation.md). A c
 
 LAB19 enables the dedicated controls at startup with TX mode 10, RX-clear mode 2, and 72 µs lead. Selecting another profile retains its native behavior. While a phone or PC configuration connection is active, the custom button override yields to configuration.
 
+For daily use, power SoundSend, disconnect any U1 configuration session, select the dedicated profile, and press a control button. No daily pairing step is needed. The transmitter address is compiled into the extension, so changing SoundSend units currently requires rebuilding and updating the U1. See [connection and changing devices](connection-and-devices.md) for the complete distinction between configuration pairing, normal reconnection, and provisioning another unit.
+
 The helper `u1_arm_soundsend.py` verifies the exact installed build and profile, sets the known radio configuration, enables control, and requests the native configuration disconnect. It is a development helper, not a required everyday bridge.
 
 ## Known limitations

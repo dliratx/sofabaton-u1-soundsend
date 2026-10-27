@@ -9,9 +9,10 @@
   "offline_suites": 7,
   "installed": true,
   "current_installed_revision": 19,
-  "physical_validation_pending": true,
   "regression": "LAB18 made one volume write when service discovery was delayed by 900 ms. LAB19 preserves the ready interval after discovery and write confirmation.",
-  "scope": "Offline validation of the exact candidate subsequently installed; physical behavior remains subject to the installation evidence and manual checks.",
+  "scope": "Offline validation of the exact candidate subsequently installed; installation diagnostics and later manual functional acceptance are recorded separately. Long-duration RF reliability and electrical power consumption remain uncharacterized.",
   "actual_boot_verified_at": "2026-10-27T16:42:40.477994+00:00",
-  "installation_evidence": "lab19-installation-summary.json"
+  "installation_evidence": "lab19-installation-summary.json",
+  "subsequent_manual_functional_acceptance_reported": true,
+  "manual_evidence": "lab19-manual-feedback.json"
 }

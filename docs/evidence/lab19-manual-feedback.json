@@ -1,0 +1,42 @@
+{
+  "recorded_date": "2026-10-27",
+  "installed_revision_context": 19,
+  "installed_build_context": "0x544d524a",
+  "source": "Subsequent manual feedback and photographs supplied for publication",
+  "feedback_english_translation": "The remote now works the way I want.",
+  "overall_functional_acceptance_reported": true,
+  "separate_feature_checklist_received": false,
+  "new_instrumented_session_performed": false,
+  "firmware_changed_for_this_documentation_update": false,
+  "photos": [
+    {
+      "path": "../images/u1-soundsend-display.png",
+      "sha256": "fb12198752de97eade88a964adb170fe868577bb6f7617d0b21de557e3091cb5",
+      "bytes": 1207172,
+      "width": 768,
+      "height": 1024,
+      "visible_evidence": "Physical U1 display showing SoundSend, volume 42%, and battery 100%.",
+      "image_transformed": false
+    },
+    {
+      "path": "../images/u1-native-profile-menu.png",
+      "sha256": "1162a7eb5d537757e91ab63845e2a7d27d6d481f2baf1e871e1396128358f839",
+      "bytes": 1234579,
+      "width": 768,
+      "height": 1024,
+      "visible_evidence": "Native profile menu showing Proyector, HDMI, and Android TV.",
+      "image_transformed": false
+    },
+    {
+      "path": "../images/u1-rear-label.png",
+      "sha256": "24ba6ed35688ae4db8086c953cd228c7b37ea8d281a5cdcfc5e3902a050bdd9c",
+      "bytes": 864693,
+      "width": 768,
+      "height": 1024,
+      "visible_evidence": "Rear label showing model U1 and FCC ID 2AT2U-U1.",
+      "image_transformed": false
+    }
+  ],
+  "scope": "Overall manual acceptance of the installed setup, with photographic evidence of the display, menu, and hardware label. This does not add individual timing measurements, electrical power measurements, long-duration reliability results, or a separate mute/restore checklist.",
+  "prior_installation_evidence": "lab19-installation-summary.json"
+}

@@ -46,14 +46,28 @@ The exact candidate passed the offline full-application installer checks. Its pa
 
 LAB19 was installed with all 7,936 blocks acknowledged. Fresh post-update diagnostics verified revision 19, build TMRJ, enabled startup, and the expected radio settings. After a read-only radio operation, three hardware snapshots showed LPTIMER1 enabled and inactivity ticks advancing from 43 to 44 to 46.
 
-That first SoundSend query did not establish a working link: its terminal central reason was `0x3e` and volume remained unknown. A follow-up PC connection timed out before issuing another query. The subsequent physical-key activation attempt also could not reach the U1. The diagnostic had disabled the key override in volatile state; final reactivation is pending, while the verified full-boot default remains enabled. A hardware volume or hold success is not claimed for LAB19.
+That first SoundSend query did not establish a working link: its terminal central reason was `0x3e` and volume remained unknown. A follow-up PC connection timed out before issuing another query. The subsequent physical-key activation attempt also could not reach the U1. The diagnostic had disabled the key override in volatile state, leaving reactivation and manual feedback outstanding at the end of that instrumented session. The verified full-boot default remained enabled. These are historical diagnostic results; subsequent manual feedback is recorded below.
 
 See [LAB19 installation evidence](evidence/lab19-installation-summary.json), [candidate evidence](evidence/lab19-candidate-summary.json), and the historical [LAB18 installation evidence](evidence/lab18-installation-summary.json).
 
-## Pending physical checks
+## Subsequent manual acceptance and photographs
 
-Final reactivation after diagnostics can use the guarded host activation helper or a full U1 restart, which restores the verified enabled boot default. Automatic screen-off in SoundSend and after leaving the profile remains pending manual confirmation. The held-volume defect remains open until the installed correction is physically tested. Mute/restore, battery display, and perceived latency also require confirmation. Long-duration RF reliability, battery consumption, independent power-cycle behavior over repeated cycles, and recovery after a failed update are not established by the offline tests.
+On 2026-10-27, subsequent feedback reported that the remote now works as intended. This is overall manual functional acceptance of the installed setup and supersedes the earlier status awaiting feedback after diagnostics. The report was not a separate checklist for every feature, and no new instrumented session or firmware transfer accompanied it.
+
+Three original photographs were supplied for publication:
+
+| Photograph | Visible evidence |
+| --- | --- |
+| [Dedicated SoundSend view](images/u1-soundsend-display.png) | The physical U1 displays SoundSend, volume 42%, and battery 100%. |
+| [Native profile menu](images/u1-native-profile-menu.png) | The native menu displays Proyector, HDMI, and Android TV. |
+| [Rear hardware label](images/u1-rear-label.png) | Model U1 and FCC ID 2AT2U-U1. |
+
+The photographs were copied without image transformations. They show interface content and hardware identification, not key timing, a live Bluetooth session, battery-estimator accuracy, or the screen-off sequence. Their hashes, dimensions, and the scope of the manual report are recorded in [manual feedback and photo evidence](evidence/lab19-manual-feedback.json).
+
+## Remaining measurement limits
+
+The installed setup has manual functional acceptance. Separate measured hold/release timing, automatic screen-off timing in each profile, a mute/restore checklist, and display latency were not supplied with that report. Long-duration RF reliability, battery consumption, independent power-cycle behavior over repeated cycles, and recovery after a failed update remain uncharacterized. The photographs do establish that the volume and battery display is present on the physical remote.
 
 ## Evidence included in Git
 
-The `docs/evidence/` directory contains bounded JSON test results and an installation summary without raw BLE payload logs or local filesystem paths. Raw development receipts, exact backups, and generated binaries stay in the local research workspace. The small `fixtures/volume-roundtrip.jsonl` contains only protocol TX/RX messages needed by one regression test.
+The `docs/evidence/` directory contains bounded JSON test results, installation summaries, and subsequent manual feedback without raw BLE payload logs or local filesystem paths. Installation summaries retain the state at the end of their diagnostic sessions; later feedback is separate evidence. Original hardware photographs are in `docs/images/`. Raw development receipts, exact backups, and generated binaries stay in the local research workspace. The small `fixtures/volume-roundtrip.jsonl` contains only protocol TX/RX messages needed by one regression test.

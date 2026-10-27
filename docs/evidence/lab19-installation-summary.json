@@ -68,5 +68,7 @@
     "mute and restore button",
     "battery display"
   ],
-  "scope": "Actual boot/build/default checks and hardware inactivity counter snapshots. The first read-only radio query did not establish a working link; physical button and display behavior remains unconfirmed."
+  "scope": "Actual boot/build/default checks and hardware inactivity counter snapshots. The first read-only radio query did not establish a working link. The pending checks and disabled key state above describe the end of that diagnostic session; subsequent manual acceptance is recorded separately.",
+  "record_type": "Historical diagnostic-session results, before subsequent manual acceptance",
+  "subsequent_manual_evidence": "lab19-manual-feedback.json"
 }

@@ -1,13 +1,21 @@
 # Change log
 
+## Documentation — Hardware photos and connection guide
+
+- Added three original photographs showing the SoundSend display, native profile menu, and U1 rear label.
+- Recorded subsequent manual feedback that the installed LAB19 setup works as intended, separately from the earlier diagnostic-session results.
+- Documented everyday use, reconnection, configuration pairing, and the fixed SoundSend address.
+- Explained the rebuild required for another transmitter and the identity and hardware checks required for another U1.
+- No firmware or device settings changed in this documentation update.
+
 ## LAB19 — Preserve the repeat window after a slow response
 
 - Start the ready interval when discovery or a volume write is confirmed, so a slow operation cannot consume the entire idle window.
 - Added regression coverage for delayed discovery, delayed volume confirmation, and a subsequent press after a slow operation.
 - Passed 134 offline tests across seven suites; the exact OTA candidate passed installer preflight validation.
-- This addresses a timing defect that reproduces LAB18's failed physical hold test; LAB19 physical validation remains pending.
+- This addresses a timing defect that reproduces LAB18's failed physical hold test; subsequent manual feedback reports that the remote now works as intended.
 - Installed with 7,936 acknowledged blocks; actual LAB19 boot, build identity, and enabled defaults verified.
-- Hardware inactivity ticks advanced after radio release. The first read-only SoundSend query failed to establish a working link; final reactivation after diagnostics and manual checks remain pending a new U1 connection.
+- Hardware inactivity ticks advanced after radio release. The first read-only SoundSend query failed to establish a working link; later manual acceptance is recorded separately from that diagnostic result.
 
 ## LAB18 — Native sleep restoration and bounded volume repetition
 
@@ -31,7 +39,7 @@
 - Enabled the dedicated controls at boot with the physically established radio settings.
 - Preserved the retained SRAM allocation and added sleep/mute regression coverage.
 - Passed 123 offline tests; actual installation and enabled boot verified.
-- Physical confirmation of the new feature behavior remains pending.
+- Physical confirmation was still pending at this revision; later installation and manual feedback are recorded under LAB19.
 
 ## LAB16 — Stable dedicated screen
 

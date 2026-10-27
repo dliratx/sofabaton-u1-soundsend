@@ -24,11 +24,30 @@ flowchart TD
 
 Only the **U1 firmware** is modified. SoundSend retains its original firmware. Bluetooth carries control messages here, not the audio stream.
 
+## Hardware photos
+
+<table>
+  <tr>
+    <td align="center"><a href="docs/images/u1-soundsend-display.png"><img src="docs/images/u1-soundsend-display.png" width="230" alt="SofaBaton U1 showing the SoundSend screen with volume 42 percent and battery 100 percent"></a></td>
+    <td align="center"><a href="docs/images/u1-native-profile-menu.png"><img src="docs/images/u1-native-profile-menu.png" width="230" alt="SofaBaton U1 showing the native Proyector, HDMI, and Android TV profile menu"></a></td>
+    <td align="center"><a href="docs/images/u1-rear-label.png"><img src="docs/images/u1-rear-label.png" width="230" alt="Rear label identifying model U1 and FCC ID 2AT2U-U1"></a></td>
+  </tr>
+  <tr>
+    <td><strong>SoundSend view.</strong> Displayed volume: 42%; displayed battery: 100%.</td>
+    <td><strong>Native profile menu.</strong> The other profiles remain available in the original interface.</td>
+    <td><strong>Hardware identification.</strong> Model U1, FCC ID 2AT2U-U1.</td>
+  </tr>
+</table>
+
+Click a photo to open the original image. The photographs document the visible interface and hardware; the battery value is the native estimator's reading.
+
 ## Current status
 
 **LAB19 / TMRJ is installed; its actual boot was verified on 2026-10-27 at 16:42:40 UTC.** All 7,936 transfer blocks were acknowledged. The installed candidate passed **134 offline tests** and corrects a delayed-response case that reproduced LAB18's failed held-volume test.
 
-Hardware snapshots confirmed that the inactivity counter continued advancing after radio release. The first read-only SoundSend query failed to establish a working link. A subsequent PC connection to the U1 timed out, leaving final button reactivation after the diagnostic and physical behavior checks pending. The controls enable automatically on a full boot. The vendor application reports version 32 for this V32-based extension; custom diagnostics identify revision 19.
+**Subsequent manual feedback confirms that the remote now works as intended.** This supersedes the earlier status awaiting manual feedback after a failed diagnostic connection. The photographs above also confirm the dedicated volume/battery view and native profile menu. The feedback is overall functional acceptance; it does not provide separate timing, current-consumption, or reliability measurements.
+
+Hardware snapshots confirmed that the inactivity counter continued advancing after radio release. Controls enable automatically on a full boot. The vendor application reports version 32 for this V32-based extension; custom diagnostics identify revision 19. The earlier failed diagnostic query remains recorded in the validation history.
 
 | Capability | Evidence |
 | --- | --- |
@@ -36,20 +55,28 @@ Hardware snapshots confirmed that the inactivity counter continued advancing aft
 | One volume step per physical press | Implemented and ARM-tested; up/down operation confirmed through manual testing |
 | Dedicated SoundSend profile | Read back from the remote; other profiles preserved |
 | Stable volume screen without profile-menu flash | LAB16 correction confirmed through manual testing |
-| Native inactivity timer after Bluetooth use | Verified advancing on hardware; automatic screen-off confirmation pending |
-| Gradual volume repetition while held | LAB19 installed and offline-tested; physical confirmation pending |
-| Mute and restore previous volume | Implemented and emulation-tested; physical button confirmation pending |
-| Earlier display update and battery percentage | Implemented and tested; physical display confirmation pending |
-| Controls enabled after boot | Verified in the actual LAB19 post-update boot; final reactivation after diagnostics pending |
+| Native inactivity timer after Bluetooth use | Verified advancing on hardware; native sleep path covered offline |
+| Gradual volume repetition while held | LAB19 delayed-response correction tested offline; subsequent overall manual acceptance recorded |
+| Mute and restore previous volume | Implemented and emulation-tested; no separate manual mute/restore checklist recorded |
+| Volume and battery display | Photographed on the physical remote; no instrumented display-latency measurement |
+| Controls enabled after boot | Verified in the actual LAB19 post-update boot; later manual operation reported working |
 | Offline validation | **134 tests passed** for installed LAB19 across seven suites |
 
-See [validation and installation evidence](docs/validation.md) for exact hashes, limits, and outstanding checks. Test success is not a claim of universal hardware compatibility or proven recovery.
+See [validation and installation evidence](docs/validation.md) for exact hashes, manual feedback, and measurement limits. Test success is not a claim of universal hardware compatibility or proven recovery.
+
+## Connection and everyday use
+
+Turn on the projector so that SoundSend has power, select **SoundSend** on the U1, and use the volume or mute buttons. No pairing step, phone, or PC is required for normal use. Disconnect any active U1 configuration session first.
+
+The installed firmware targets SoundSend address `CC:90:93:18:93:0A`. A button press starts a direct connection; the link closes after a short idle interval and the next press connects again. The target survives battery replacement because it is compiled into the firmware. There is currently no menu for choosing a different SoundSend: changing transmitters requires verifying the replacement device and rebuilding and installing the U1 extension with its address.
+
+See [connection, reconnection, and changing devices](docs/connection-and-devices.md) for the complete procedure, including the difference between configuration pairing and normal control.
 
 ## Controls
 
 Select the **SoundSend** profile on the U1 and keep the transmitter powered.
 
-The hold behavior below describes the installed LAB19 implementation and still requires physical confirmation.
+The behavior below describes the installed LAB19 implementation. Subsequent manual feedback reports that the remote works as intended.
 
 | Button | Action |
 | --- | --- |
@@ -66,13 +93,14 @@ Volume keys leave mute starting from the actual zero level. A different controll
 
 | Location | Purpose |
 | --- | --- |
+| [docs/connection-and-devices.md](docs/connection-and-devices.md) | Everyday connection, reconnection, pairing, and using another transmitter or remote |
 | [docs/problem-and-solution.md](docs/problem-and-solution.md) | Requirements, investigation, and design decisions |
 | [docs/architecture.md](docs/architecture.md) | Firmware modules, timing, memory, and integration |
 | [docs/power-management.md](docs/power-management.md) | Inactivity timer regression, sleep restoration, and volume hold behavior |
 | [docs/protocol.md](docs/protocol.md) | Verified SoundSend messages and U1 controls |
 | [docs/build-and-test.md](docs/build-and-test.md) | Offline build setup and test reproduction |
 | [docs/installation.md](docs/installation.md) | Unit-specific OTA workflow and constraints |
-| [docs/validation.md](docs/validation.md) | Recorded results and remaining physical checks |
+| [docs/validation.md](docs/validation.md) | Recorded results, hardware photos, manual acceptance, and evidence limits |
 | [CHANGELOG.md](CHANGELOG.md) | Key experimental revisions |
 | [firmware/](firmware/) | C, Thumb assembly, linker scripts, builders, and ARM tests |
 | `u1_*.py`, `ble_probe.py` | Windows installation, identification, and diagnostic tools |

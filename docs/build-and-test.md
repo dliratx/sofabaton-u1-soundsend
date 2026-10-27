@@ -54,7 +54,7 @@ The full build produces three ARM ELF files, an assembled image, an OTA package,
 | `test_lcd_retention_arm.py` | 2 | Lower-SRAM state and mute restoration after modeled upper-bank loss |
 | `test_ota_lab_arm.py` | 6 | Original OTA handlers, boot copy, descriptor and protected regions |
 | `test_ota_transport.py` | 8 | Host framing, strict acknowledgements, stop behavior, postboot identity |
-| **Total** | **134** | **All passed for the installed candidate; physical behavior checks pending** |
+| **Total** | **134** | **All passed for the installed candidate; subsequent manual functional acceptance recorded separately** |
 
 The standalone `test_delta_lab_arm.py` is historical research and is not part of this full-application build. It requires local installed-state and delta artifacts that are not included in a clone.
 
